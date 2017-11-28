@@ -1,30 +1,9 @@
-import {Component, OnInit} from '@angular/core';
-import {LunchAppointment, LunchAppointmentSearchResults} from './app.model';
-import {HttpClient} from '@angular/common/http';
-import {reject} from 'q';
-
-// TODO: XSS attack protection; https://docs.djangoproject.com/en/1.11/ref/csrf/
-
-function *dateGenerator(initial_date: Date): IterableIterator<LunchAppointment> {
-  yield new LunchAppointment(initial_date, null, []);
-  for (let i = 1; i < 30; i++) {
-    const app_date = new Date(initial_date.getTime() + i * 1000 * 60 * 60 * 24);
-    yield new LunchAppointment(app_date, 'Awesome Lunch.com', ['Jack', 'Jill']);
-  }
-}
-
-const SERVER_URL = 'http://localhost:8001/';
-const ENROLLMENT_URL = SERVER_URL + 'Enrollment/Success/';
-const LOGIN_URL = SERVER_URL + 'Login/Success/';
-const MY_EVENTS_URL = SERVER_URL + 'MyEvents/Success/';
-// const LOGIN_URL = SERVER_URL + 'Login/Failure/';
-// const ENROLLMENT_URL = SERVER_URL + 'Enrollment/Failure/1/';
-
-interface EventsAPI {
-  success: boolean;
-  message: string;
-  appointments: LunchAppointment[];
-}
+import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {LunchAppointment} from './app.model';
+import {BsModalRef, BsModalService} from 'ngx-bootstrap';
+import {NgForm} from '@angular/forms';
+import {AppointmentService, EventsAPI} from './appointment.service';
+import {AuthService} from './auth.service';
 
 interface LocationOptions {
   id: string;
@@ -36,128 +15,163 @@ interface FoodOptions {
   name: string;
 }
 
-interface EnrollmentAPI {
-  success: boolean;
-  message: string;
-  error_fields: string[];
-}
-
-interface Login {
-  email: string;
-  password: string;
-  submitted: boolean;
-  error_messages: string[];
-  success: boolean;
-}
-
-interface Enrollment {
-  email: string;
-  password: string;
-  invitation_code: string;
-  whitelist: string[];
-  locations: string[];
-  submitted: boolean;
-  error_messages: string[];
-  success: boolean;
-}
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  providers: [AppointmentService, AuthService]
 })
 
+
 export class AppComponent implements OnInit {
-  enrollment: Enrollment;
-  login: Login;
   state: string;
-  dateIterator: any;
-  searchResultIterator: LunchAppointmentSearchResults[];
-  searching: boolean;
+  joinedAppointment = false;
   foodOptions: FoodOptions[];
   locationOptions: LocationOptions[];
+  errormodal_message: string;
+
+  @ViewChild('errorModal') private errorModal: TemplateRef<any>;
+  @ViewChild('searchForm') searchForm: NgForm;
+  @ViewChild('enrollmentForm') enrollmentForm: NgForm;
+  @ViewChild('loginForm') loginForm: NgForm;
+  @ViewChild('invitationForm') invitationForm: NgForm;
+
+  modalRef: BsModalRef; // To trigger bootstrap modals.
+
+  openModal(template: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(template);
+  }
+
+  goLogout() {
+    this.authService.logout().then( () => {
+      console.log('Logout Successful.');
+      this.authService.clear();
+      this.appointmentService.clear();
+      this.state = 'login';
+    }).catch(() => {
+      console.log('failure while logging out; are you still connected to the internet?  Check our uptime at ()');
+      this.errormodal_message = 'failure while logging out; are you still connected to the internet?  Check our uptime at';
+      this.openModal(this.errorModal);
+    });
+  }
+
+  goInvitation() {
+    this.authService.blank_invitation();
+    this.state = 'invitation';
+  }
+
+  goAvailability() {
+    this.state = 'availability';
+  }
+
+  goSearch() {
+    this.state = 'search';
+  }
+
+  goPublicEvents() {
+    this.state = 'publicevents';
+  }
+
+  goMyEvents() {
+    this.state = 'myevents';
+  }
+
+  goLogin() {
+    this.state = 'login';
+  }
+
+  goProfile() {
+    this.state = 'profile';
+  }
 
   goEnrollment() {
     this.state = 'enrollment';
   }
 
-  EnrollmentAPIPromise(): Promise<any> {
-    return this.http.post(ENROLLMENT_URL, JSON.stringify(this.enrollment)).toPromise();
+  searching(): boolean {
+    return this.appointmentService.searching;
   }
 
-  MyEventsAPIPromise(): Promise<any> {
-    return this.http.get(MY_EVENTS_URL, JSON.stringify(this.enrollment)).toPromise();
+  appointments(): LunchAppointment[] {
+    if (this.state === 'myevents') {
+      return this.appointmentService.myAppointments.appointments;
+    }
+
+    if (this.state === 'publicevents') {
+      return this.appointmentService.everyoneAppointments.appointments;
+    }
+
+    if (this.state === 'search' && this.appointmentService.searchResults) {
+      return this.appointmentService.searchResults.appointments;
+    }
   }
 
-  LoginAPIPromise(): Promise<any> {
-    this.login.submitted = true;
-    return this.http.post(LOGIN_URL, JSON.stringify(this.login)).toPromise();
+  onAppointmentJoined(): void {
+    this.state = 'myevents';
+    this.joinedAppointment = true;
+    setTimeout(() => { this.joinedAppointment = false; }, 1000);
+  }
+
+  onSubmitSearch(): void {
+    this.appointmentService.search(this.searchForm).catch((err) => {
+      console.log('Search Error!');
+      console.log(err);
+    });
+  }
+
+  onSubmitInvitation(): void {
+    this.state = 'waiting';
+    this.authService.send_invitation(this.invitationForm.value).then(() => {
+      this.state = 'invitationsuccess';
+    }).catch(() => {
+      this.state = 'invitation';
+    });
   }
 
   onSubmitEnrollment(): void {
     // Ensure validity of form
-    this.enrollment.submitted = true;
     this.state = 'waiting';
-
-    this.EnrollmentAPIPromise().then((res) => {
-      console.log(res);
-      if (!res.success) {
-        return reject(res.message);
-      }
-      this.enrollment.success = true;
+    this.authService.send_enrollment(this.enrollmentForm.value).then(() => {
       this.state = 'login';
-    }).catch((err) => {
-      this.enrollment.error_messages = [err];
+    }).catch(() => {
       this.state = 'enrollment';
     });
   }
 
-  onSubmitLogin(): void {
-    this.state = 'waiting';
 
-    this.LoginAPIPromise().then((res) => {
-      console.log(res);
-      if (!res.success) {
-        return reject('Login failed.  Please check your email and password');
-      }
-      this.login.success = true;
-      this.state = 'loadmyevents';
-    }).then((res) => {
-      return this.MyEventsAPIPromise();
-    }).then((res: EventsAPI) => {
-      console.log(res);
-      this.dateIterator = res.appointments;
-      this.state = 'myevents'
-    }).catch((err) => {
-      this.state = 'login';
-      this.login.error_messages = [err];
+  onSubmitProfileForm(): void {
+    this.authService.send_profile_change().catch( (err) => {
+      console.log(err);
     });
   }
 
-  constructor(private http: HttpClient) {
-    this.enrollment = {
-      'email': '',
-      'password': '',
-      'invitation_code': '',
-      'whitelist': [],
-      'locations': [],
-      'submitted': false,
-      'error_messages': [],
-      'success': false
-    };
+  onSubmitLogin(): void {
+    // We need to load our own events, and the public / 'Everyone' appointments
 
-    this.login = {
-      'email': '',
-      'password': '',
-      'submitted': false,
-      'error_messages': [],
-      'success': false
-    };
+    this.state = 'waiting';
+    this.authService.send_login(this.loginForm.value).then(() => {
+      this.state = 'loadmyevents';
+      const p1 = this.appointmentService.my();
+      const p2 = this.appointmentService.everyone();
+      return Promise.all([p1, p2]);
+    }).then(() => {
+      this.state = 'myevents';
+    }).catch((err) => {
+      this.state = 'login';
+      console.log(err);
+    });
+  }
 
+  constructor(private modalService: BsModalService,
+              public authService: AuthService,
+              public appointmentService: AppointmentService) {
+
+  }
+  ngOnInit() {
+    this.authService.clear();
     this.state = 'login';
-    this.dateIterator = [...dateGenerator(new Date())];
-    this.searchResultIterator = [];
-    this.searching = false;
+
     this.foodOptions = [
       {'id': '1', 'name': 'Chinese'},
       {'id': '2', 'name': 'Indian'},
@@ -169,8 +183,4 @@ export class AppComponent implements OnInit {
       {'id': '3', 'name': 'Koenji Station'}
     ];
   }
-  ngOnInit() {  }
-
-  OnInit() {}
-
 }

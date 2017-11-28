@@ -1,0 +1,25 @@
+<table class="table" id="SearchResultTable" *ngIf="appointments && appointments.length > 0; else noResultsFound">
+<tr>
+  <th>Name</th>
+  <th>Date</th>
+  <th>Location</th>
+  <th>People Attending</th>
+</tr>
+<tr *ngFor="let app of appointments; let i=index" [ngClass]="{'highlight': app.highlight}">
+  <td>{{i}}: {{app.title}}</td>
+  <td>{{app.date | date:'yyyy-MM-dd'}}</td>
+  <td>{{app.location}}</td>
+  <td>
+    <div *ngIf="app.people.length > 0">
+      <ul class="list-group"><li class="list-group-item" *ngFor="let peep of app.people">{{peep}}</li></ul>
+    </div>
+  </td>
+  <td *ngIf="allowJoiningEvent">
+      <button class="btn btn-info" (click)="joinAppointment(app.id)" *ngIf="app.space_available > 0; else NoSpaceAvailable">Join</button>
+      <ng-template #NoSpaceAvailable>Event Full</ng-template>
+  </td>
+</tr>
+</table>
+<ng-template #noResultsFound>
+  <p>No search results found.</p>
+</ng-template>
