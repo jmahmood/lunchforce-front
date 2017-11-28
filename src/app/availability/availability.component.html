@@ -1,29 +1,55 @@
-<app-calendar-header
-  [(view)]="view"
-  [(viewDate)]="viewDate">
-</app-calendar-header>
+<p>Availability Calendar</p>
 
-<div class="alert alert-info">
-  Click on a day on the view.
-  <strong *ngIf="clickedDate">You clicked on this day: {{ clickedDate | date:'medium' }}</strong>
-</div>
+<div class="row">
+  <div class="col-sm-6">
 
-<div [ngSwitch]="view">
-  <mwl-calendar-month-view
-    *ngSwitchCase="'month'"
-    [viewDate]="viewDate"
-    [events]="events"
-    (dayClicked)="clickedDate = $event.day.date">
-  </mwl-calendar-month-view>
-  <mwl-calendar-week-view
-    *ngSwitchCase="'week'"
-    [viewDate]="viewDate"
-    [events]="events"
-    (dayHeaderClicked)="clickedDate = $event.day.date">
-  </mwl-calendar-week-view>
-  <mwl-calendar-day-view
-    *ngSwitchCase="'day'"
-    [viewDate]="viewDate"
-    [events]="events">
-  </mwl-calendar-day-view>
+    <div class="input-group">
+      <div class="input-group-btn">
+        <button type="button" class="btn btn-default" (click)="prev_month()"><span class="glyphicon glyphicon-chevron-left"></span> Prev</button>
+      </div>
+      <input type="text" class="form-control" aria-label="..." value="{{ current.getFullYear() }} - {{ current.toLocaleString('ja-jp', { month: 'long' }) }}" disabled>
+
+      <div class="input-group-btn">
+        <button type="button" class="btn btn-default" (click)="next_month()">Next <span class="glyphicon glyphicon-chevron-right"></span></button>
+      </div>
+    </div>
+    <div class="row seven-cols hidden-xs">
+      <div class="col-sm-1">月</div>
+      <div class="col-sm-1">火</div>
+      <div class="col-sm-1">水</div>
+      <div class="col-sm-1">木</div>
+      <div class="col-sm-1">金</div>
+      <div class="col-sm-1">土</div>
+      <div class="col-sm-1">日</div>
+      <hr>
+      <div class="col-sm-1" *ngFor="let d of display_dates" [ngClass]="{'past': d < today,
+                  'nextmonth': d.getMonth() > current.getMonth(),
+                  'previousmonth': d.getMonth() < current.getMonth(),
+                  'selected':  is_selected_date(d)}" (click)="toggle_date(d)">{{ d | date:'dd' }}　</div>
+    </div>
+
+    <ul class="list-group hidden-sm hidden-md hidden-lg">
+      <li class="list-group-item" *ngFor="let d of display_dates"
+      [ngClass]="{'past': d < today,
+                  'nextmonth': d.getMonth() > current.getMonth(),
+                  'previousmonth': d.getMonth() < current.getMonth(),
+                  'selected':  is_selected_date(d),
+                  'list-group-item-success':  d < today && is_selected_date(d),
+                  'list-group-item-info': d > today && is_selected_date(d)}"
+      (click)="toggle_date(d)">
+                  {{ d | date:'yyyy-MM-dd' }}
+                  ({{ d.toLocaleString('ja-jp', { weekday: 'short' }) }})
+      </li>
+    </ul>
+
+    <button type="button" class="btn btn-default" (click)="submitAvailability()"></button>
+  </div>
+  <div class="col-sm-6">
+    Your next 5 days are:
+    <ul>
+      <li class="list-group-item" *ngFor="let d of selected_dates_array">
+        {{ d }}
+      </li>
+    </ul>
+  </div>
 </div>

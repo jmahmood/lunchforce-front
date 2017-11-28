@@ -9,7 +9,6 @@ import { SalesforceOnlyDirective } from './salesforce-only.directive';
 import { AppointmentItemComponent } from './appointment-item/appointment-item.component';
 import { CalendarModule } from 'angular-calendar';
 import { AvailabilityComponent } from './availability/availability.component';
-import { CalendarHeaderComponent } from './demo-utils/calendar-header.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +16,6 @@ import { CalendarHeaderComponent } from './demo-utils/calendar-header.component'
     SalesforceOnlyDirective,
     AppointmentItemComponent,
     AvailabilityComponent,
-    CalendarHeaderComponent
   ],
   imports: [
     BrowserModule,

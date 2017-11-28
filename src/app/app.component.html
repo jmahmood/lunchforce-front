@@ -36,7 +36,6 @@
     </div><!-- /.container-fluid -->
   </nav>
   <div class="container">
-    <app-availability></app-availability>
     <div *ngIf="state=='waiting'">waiting...</div>
     <div *ngIf="state=='loadmyevents'">loading your upcoming lunch data...</div>
     <div *ngIf="state=='enrollment'">
@@ -289,7 +288,7 @@
 
   </div>
     <div *ngIf="state=='availability'">
-
+          <app-availability></app-availability>
     </div>
     <div *ngIf="state=='publicevents'">
       <div class="alert alert-error" role="alert" [hidden]="!joinedAppointment">
