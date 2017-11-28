@@ -33,6 +33,7 @@ export class AvailabilityComponent implements OnInit {
 
   submitAvailability(): void {
     console.log('Submitting availability to server');
+
   }
 
   // Get all days for this month; includes days to round out the week, and removes any old days before the start of the current week,

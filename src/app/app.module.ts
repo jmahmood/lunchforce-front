@@ -7,7 +7,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { ModalModule } from 'ngx-bootstrap';
 import { SalesforceOnlyDirective } from './salesforce-only.directive';
 import { AppointmentItemComponent } from './appointment-item/appointment-item.component';
-import { CalendarModule } from 'angular-calendar';
 import { AvailabilityComponent } from './availability/availability.component';
 
 @NgModule({
@@ -22,7 +21,6 @@ import { AvailabilityComponent } from './availability/availability.component';
     FormsModule,
     HttpClientModule,
     ModalModule.forRoot(),
-    CalendarModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]

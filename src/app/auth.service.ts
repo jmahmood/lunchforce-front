@@ -15,6 +15,17 @@ export interface LogoutAPI {
   error_messages: string[];
 }
 
+export interface Availability {
+  date: Date;
+  in_use: boolean;
+}
+
+export interface SetAvailablilityAPI {
+  success: boolean;
+  message: string;
+  availability: Availability[];
+}
+
 export interface InvitationAPI {
   invitation_code: string;
   success: boolean;
