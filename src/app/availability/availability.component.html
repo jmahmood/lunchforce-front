@@ -28,6 +28,7 @@
                   'selected':  is_selected_date(d)}" (click)="toggle_date(d)">{{ d | date:'dd' }}　</div>
     </div>
 
+
     <ul class="list-group hidden-sm hidden-md hidden-lg">
       <li class="list-group-item" *ngFor="let d of display_dates"
       [ngClass]="{'past': d < today,
@@ -42,7 +43,7 @@
       </li>
     </ul>
 
-    <button type="button" class="btn btn-default" (click)="submitAvailability()"></button>
+    <button type="button" class="btn btn-default" (click)="submitAvailability()">Update my Availability</button>
   </div>
   <div class="col-sm-6">
     Your next 5 days are:

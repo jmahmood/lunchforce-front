@@ -1,6 +1,5 @@
 import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
-import { CalendarEvent } from 'angular-calendar';
-import {getWeek} from "ngx-bootstrap/bs-moment/units/week";
+import {AppointmentService, SetAvailablilityAPI} from '../appointment.service';
 
 
 function getWeekNumber(d) {
@@ -26,14 +25,43 @@ function getWeekNumber(d) {
 })
 export class AvailabilityComponent implements OnInit {
   selected_dates: {} = {};
-  selected_dates_array: string[] = []
+  selected_dates_array: string[] = [];
   display_dates: Date[] = [];
   current: Date;
   today: Date;
 
+  reset(): void {
+    this.today = new Date();
+    this.current = new Date(this.today);
+  }
+
+  clear(): void {
+    this.selected_dates = {};
+    this.selected_dates_array = [];
+  }
+
+  set_availability(): void {
+      for (const avail of this.appointmentService.myAvailability.availability) {
+        this.toggle_date(avail.date);
+      }
+  }
+
   submitAvailability(): void {
     console.log('Submitting availability to server');
-
+    console.log(this.selected_dates);
+    this.appointmentService.send_availablility(Object.values(this.selected_dates)).then((res: SetAvailablilityAPI) => {
+      this.clear();
+      console.log(this.selected_dates);
+      this.set_availability();
+      return res;
+    }).then((res: SetAvailablilityAPI) => {
+      // TODO: Show error messages for places you couldn't change availability
+      // IE: Places you have already inserted appointments
+      console.log(res);
+      return res;
+    }).catch((err) => {
+      console.log(err);
+    });
   }
 
   // Get all days for this month; includes days to round out the week, and removes any old days before the start of the current week,
@@ -68,24 +96,23 @@ export class AvailabilityComponent implements OnInit {
      return days;
   }
 
-  constructor() { }
+  constructor(public appointmentService: AppointmentService) { }
 
   ngOnInit() {
-    this.current = new Date();
-    this.today = new Date();
+    this.clear();
+    this.reset();
+    this.set_availability();
     this.set_display_dates();
   }
 
   toggle_date(d: Date): boolean {
     // Returns true if it is selected now, or false if it is not.
     const k = d.toISOString().split('T')[0];
+    const add_date = d > this.today && !this.selected_dates[k];
 
-    if (d > this.today) {
-      this.selected_dates[k] = !this.selected_dates[k];
+    if (add_date) {
+      this.selected_dates[k] = d;
     } else {
-      console.log('You cannot make yourself retroactively available.');
-    }
-    if (!this.selected_dates[k]){
       delete(this.selected_dates[k]);
     }
     this.set_selected_dates();

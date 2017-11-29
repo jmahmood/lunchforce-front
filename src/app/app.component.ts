@@ -4,6 +4,7 @@ import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {NgForm} from '@angular/forms';
 import {AppointmentService, EventsAPI} from './appointment.service';
 import {AuthService} from './auth.service';
+import {HttpErrorResponse} from "@angular/common/http";
 
 interface LocationOptions {
   id: string;
@@ -154,11 +155,15 @@ export class AppComponent implements OnInit {
       this.state = 'loadmyevents';
       const p1 = this.appointmentService.my();
       const p2 = this.appointmentService.everyone();
-      return Promise.all([p1, p2]);
+      const p3 = this.appointmentService.available();
+      return Promise.all([p1, p2, p3]);
     }).then(() => {
       this.state = 'myevents';
     }).catch((err) => {
       this.state = 'login';
+      if (err.status === 0) {
+        this.authService.login.error_messages = ['Could not connect to server'];
+      }
       console.log(err);
     });
   }
