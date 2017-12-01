@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {LunchAppointment} from './app.model';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {NgForm} from '@angular/forms';
 import {reject} from 'q';
 
@@ -43,10 +43,11 @@ export interface SetAvailablilityAPI {
 }
 
 
+// http://localhost:8000/api/my-appointments/
 const SERVER_URL = 'http://localhost:8001/';
 const SEARCH_URL = SERVER_URL + 'Search/Success/';
 const JOIN_EVENT_URL = SERVER_URL + 'Events/Join/Success/';
-const MY_EVENTS_URL = SERVER_URL + 'MyEvents/Success/1/';
+const MY_EVENTS_URL = 'http://localhost:8000/api/my-appointments/';
 const PUBLIC_EVENTS_URL = SERVER_URL + 'PublicEvents/Success/';
 const MY_AVAILABILITY_URL = SERVER_URL + 'Availability/Get/Success/';
 const UPDATE_AVAILABILITY_URL = SERVER_URL + 'Availability/Update/Success/';
@@ -76,7 +77,7 @@ export class AppointmentService {
     }
   }
 
-  send_availablility(availableOn: Date[]): Promise<any> {
+  send_availability(availableOn: Date[]): Promise<any> {
     return this.http.post(UPDATE_AVAILABILITY_URL, availableOn).toPromise().then((res: SetAvailablilityAPI) => {
       if (!res.success) {
         return reject(res.message);
@@ -88,11 +89,13 @@ export class AppointmentService {
     });
   }
 
-  available(): Promise<any> {
-    return this.http.get(MY_AVAILABILITY_URL).toPromise().then((res: GetAvailablilityAPI) => {
+  available(auth_token: String): Promise<any> {
+    const token_header = new HttpHeaders().set('Authorization', 'Token ' + auth_token);
+    return this.http.get(MY_AVAILABILITY_URL, {'headers': token_header}).toPromise().then((res: GetAvailablilityAPI) => {
       this.myAvailability = res;
-      console.log(this.myAvailability);
       this.set_availability_dates();
+      console.log('my current availability');
+      console.log(this.myAvailability);
       return res;
     });
 
@@ -109,11 +112,13 @@ export class AppointmentService {
         return reject(res.message);
       }
       this.searchResults = res;
+      console.log('search results');
+      console.log(res);
+      return res;
     });
   }
 
   join(event_id: string): Promise<any> {
-    console.log('Service');
     return this.http.post(JOIN_EVENT_URL,
       JSON.stringify({'event_id': event_id})).toPromise().then((res: JoinEventAPI) => {
       console.log(res);
@@ -124,16 +129,27 @@ export class AppointmentService {
     });
   }
 
-  my(): Promise<any> {
-    return this.http.get(MY_EVENTS_URL).toPromise().then((res: EventsAPI) => {
+  my(auth_token: String): Promise<any> {
+    const token_header = new HttpHeaders().set('Authorization', 'Token ' + auth_token);
+    return this.http.get(MY_EVENTS_URL, {'headers': token_header}).toPromise().then((res: EventsAPI) => {
+      if (!res.success) {
+        return reject(res.message);
+      }
       this.myAppointments = res;
+      console.log('my appointments');
+      console.log(res);
       return res;
     });
   }
 
-  everyone(): Promise<any> {
+  everyone(auth_token: String): Promise<any> {
     // "Public" is a reserved word, so we go with the term "Everyone"
     return this.http.get(PUBLIC_EVENTS_URL).toPromise().then((res: EventsAPI) => {
+      if (!res.success) {
+        return reject(res.message);
+      }
+      console.log('public appointments');
+      console.log(res);
       this.everyoneAppointments = res;
       return res;
     });

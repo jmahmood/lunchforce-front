@@ -49,7 +49,7 @@ export class AvailabilityComponent implements OnInit {
   submitAvailability(): void {
     console.log('Submitting availability to server');
     console.log(this.selected_dates);
-    this.appointmentService.send_availablility(Object.values(this.selected_dates)).then((res: SetAvailablilityAPI) => {
+    this.appointmentService.send_availability(Object.values(this.selected_dates)).then((res: SetAvailablilityAPI) => {
       this.clear();
       console.log(this.selected_dates);
       this.set_availability();

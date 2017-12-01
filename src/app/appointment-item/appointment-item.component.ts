@@ -1,6 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {LunchAppointment} from '../app.model';
 import {AppointmentService, EventsAPI} from '../appointment.service';
+import {AuthService} from "../auth.service";
 
 @Component({
   selector: 'app-appointment-item',
@@ -15,9 +16,8 @@ export class AppointmentItemComponent implements OnInit {
 
 
   joinAppointment(event_id: string): void {
-    console.log('Component');
     this.appointmentService.join(event_id).then( () => {
-        return this.appointmentService.my(); // My appointments are refreshed.
+        return this.appointmentService.my(this.authService.token); // My appointments are refreshed.
       }
     ).then((res: EventsAPI) => {
       /*  This stuff only affects this particular component. */
@@ -33,8 +33,11 @@ export class AppointmentItemComponent implements OnInit {
     });
   }
 
-  constructor(public appointmentService: AppointmentService) { }
+  constructor(public appointmentService: AppointmentService, public authService: AuthService) { }
 
   ngOnInit() {}
 
+  lg(string: String) {
+    console.log(string);
+  }
 }

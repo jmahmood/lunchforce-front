@@ -11,7 +11,7 @@
   <td>{{app.location}}</td>
   <td>
     <div *ngIf="app.people.length > 0">
-      <ul class="list-group"><li class="list-group-item" *ngFor="let peep of app.people">{{peep}}</li></ul>
+      <ul class="list-group"><li class="list-group-item" *ngFor="let peep of app.people" (click)="lg(peep[0]);">{{peep[1]}}</li></ul>
     </div>
   </td>
   <td *ngIf="allowJoiningEvent">

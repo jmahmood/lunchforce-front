@@ -142,11 +142,11 @@
     </div>
     <div class="search" *ngIf="state=='search'" >
       <form id="searchForm" (ngSubmit)="onSubmitSearch()" #searchForm="ngForm">
-        <div class="alert alert-danger" role="alert" [hidden]="appointmentService.searchResults == null || !appointmentService.searchResults.message">
+        <div class="alert alert-danger" role="alert" *ngIf="appointmentService.searchResults != null && appointmentService.searchResults.message">
           <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
           <span class="sr-only">Error:</span>
-          <span *ngFor="let err_msg of authService.profile.error_messages">
-              {{err_msg}}<br>
+          <span>
+              {{appointmentService.searchResults.message}}<br>
           </span>
         </div>
 
@@ -224,31 +224,31 @@
           Profile update completed.
         </div>
 
-        <div class="alert alert-danger" role="alert" [hidden]="authService.profile.error_messages.length == 0">
+        <div class="alert alert-danger" role="alert" [hidden]="!authService.profile.message">
           <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
           <span class="sr-only">Error:</span>
-          <span *ngFor="let err_msg of authService.profile.error_messages">
-              {{err_msg}}<br>
+          <span>
+              {{authService.profile.message}}<br>
           </span>
         </div>
 
         <div class="form-group">
           <label for="enrollmentEmail">Email address</label>
           <input type="email" class="form-control" id="profileEmail" name="profileEmail" placeholder="Email"
-                 [(ngModel)]="authService.profile.email" disabled>
+                 [(ngModel)]="authService.profile.profile.email" disabled>
         </div>
 
         <div class="form-group">
           <label for="selectWhitelist">I like</label>
           <select multiple="multiple" id="profileWhiteList" name="profileWhiteList" class="form-control"
-                  [(ngModel)]="authService.profile.whitelist">
+                  [(ngModel)]="authService.profile.profile.whitelist">
             <option *ngFor="let foodOption of foodOptions" id="profile_{{foodOption.id}}" [ngValue]="foodOption.name">{{foodOption.name}}</option>
           </select>
         </div>
 
         <div class="form-group">
           <label for="selectLocation">I can meet you near</label>
-          <select multiple="multiple" id="profileLocation" name="profileLocation" class="form-control" [(ngModel)]="authService.profile.locations">
+          <select multiple="multiple" id="profileLocation" name="profileLocation" class="form-control" [(ngModel)]="authService.profile.profile.locations">
             <option *ngFor="let locationOption of locationOptions" id="profile_{{locationOption.id}}" [ngValue]="locationOption.name">{{locationOption.name}}</option>
           </select>
         </div>

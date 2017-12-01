@@ -115,6 +115,7 @@ export class AppComponent implements OnInit {
   }
 
   onSubmitSearch(): void {
+    console.log('trigger search')
     this.appointmentService.search(this.searchForm).catch((err) => {
       console.log('Search Error!');
       console.log(err);
@@ -153,10 +154,11 @@ export class AppComponent implements OnInit {
     this.state = 'waiting';
     this.authService.send_login(this.loginForm.value).then(() => {
       this.state = 'loadmyevents';
-      const p1 = this.appointmentService.my();
-      const p2 = this.appointmentService.everyone();
-      const p3 = this.appointmentService.available();
-      return Promise.all([p1, p2, p3]);
+      const p1 = this.appointmentService.my(this.authService.token);
+      const p2 = this.appointmentService.everyone(this.authService.token);
+      const p3 = this.appointmentService.available(this.authService.token);
+      const p4 = this.authService.my_profile();
+      return Promise.all([p1, p2, p3, p4]);
     }).then(() => {
       this.state = 'myevents';
     }).catch((err) => {

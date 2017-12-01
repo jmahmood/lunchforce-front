@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
-import{HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {reject} from 'q';
 
 const SERVER_URL = 'http://localhost:8001/';
 const ENROLLMENT_URL = SERVER_URL + 'Enrollment/Success/';
-const LOGIN_URL = SERVER_URL + 'Login/Success/';
+// const LOGIN_URL = SERVER_URL + 'Login/Success/';
+const LOGIN_URL = 'http://localhost:8000/api-token-auth/';
+const GET_PROFILE_URL = 'http://localhost:8000/api/my-profile/';
 // const LOGIN_URL = SERVER_URL + 'Login/Failure/';
 const INVITATION_URL = SERVER_URL + 'InvitationCode/Create/Success/';
 const PROFILE_UPDATE_URL = SERVER_URL + 'Profile/Success/';
@@ -57,13 +59,19 @@ export interface Invitation {
 }
 
 export interface ProfileDetails {
-  email: string;
-  name: string;
-  locations: string[];
-  whitelist: string[];
+  profile: {
+    email: string;
+    name: string;
+    locations: string[];
+    whitelist: string[];
+  };
   success: boolean;
-  error_messages: string[];
+  message: string;
   updated: boolean;
+}
+
+export interface LoginAPIResponse {
+  token: string; // This is used to allow logins.
 }
 
 export interface Login {
@@ -86,6 +94,7 @@ export class AuthService {
   invitation: Invitation;
   profile: ProfileDetails;
   login: Login;
+  token: string;
 
 
   blank_login(): void {
@@ -156,28 +165,43 @@ export class AuthService {
 
       if (!res.success) {
         this.profile.updated = true;
-        this.profile.error_messages = [res.message];
+        this.profile.message = res.message;
         return reject(res.message);
       }
       setTimeout(() => { this.profile.updated = false; }, 1000);
     });
   }
 
-  send_login(login_data: LoginPostAPI): Promise<any> {
-    this.login.submitted = true;
-    const prom = this.http.post(LOGIN_URL, JSON.stringify(this.login)).toPromise();
-    this.login.password = ''; // Delete the login password after we submit.
-    return prom.then((res: ProfileDetails) => {
+  my_profile(): Promise<any> {
+    const token_header = new HttpHeaders().set('Authorization', 'Token ' + this.token);
+    return this.http.get(GET_PROFILE_URL, {'headers': token_header}).toPromise().then((res: ProfileDetails) => {
       if (!res.success) {
-        this.login.error_messages = res.error_messages;
+        this.login.error_messages = [res.message];
         return reject('Login failed.  Please check your email and password');
       }
       this.profile = res;
       this.profile.updated = false;
+
+      console.log('setting profile');
+      console.log(this.profile);
       this.login.success = true;
       return res;
     });
   }
+
+  send_login(login_data: LoginPostAPI): Promise<any> {
+    this.login.submitted = true;
+    const prom = this.http.post(LOGIN_URL,
+      {
+        'username': login_data.loginFormEmail,
+        'password': login_data.loginFormPassword}).toPromise();
+    this.login.password = ''; // Delete the login password after we submit.
+    return prom.then((res: LoginAPIResponse) => {
+      console.log('login api response');
+      console.log(res);
+      this.token = res.token;
+    });
+ }
 
   logout(): Promise<any> {
     return this.http.post(LOGOUT_URL, {}).toPromise().then( (res: LogoutAPI) => {
