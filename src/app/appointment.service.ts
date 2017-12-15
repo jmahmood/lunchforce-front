@@ -48,9 +48,9 @@ const SERVER_URL = 'http://localhost:8001/';
 const SEARCH_URL = SERVER_URL + 'Search/Success/';
 const JOIN_EVENT_URL = SERVER_URL + 'Events/Join/Success/';
 const MY_EVENTS_URL = 'http://localhost:8000/api/my-appointments/';
-const PUBLIC_EVENTS_URL = SERVER_URL + 'PublicEvents/Success/';
-const MY_AVAILABILITY_URL = SERVER_URL + 'Availability/Get/Success/';
-const UPDATE_AVAILABILITY_URL = SERVER_URL + 'Availability/Update/Success/';
+const PUBLIC_EVENTS_URL = 'http://localhost:8000/api/public-appointments/';
+const MY_AVAILABILITY_URL = 'http://localhost:8000/api/my-availability/';
+const UPDATE_AVAILABILITY_URL = 'http://localhost:8000/api/update-availability/';
 
 
 @Injectable()
@@ -77,8 +77,10 @@ export class AppointmentService {
     }
   }
 
-  send_availability(availableOn: Date[]): Promise<any> {
-    return this.http.post(UPDATE_AVAILABILITY_URL, availableOn).toPromise().then((res: SetAvailablilityAPI) => {
+  send_availability(auth_token: String, month: number, availableOn: String[]): Promise<any> {
+    const token_header = new HttpHeaders().set('Authorization', 'Token ' + auth_token);
+    return this.http.post(UPDATE_AVAILABILITY_URL, {month: month, date: availableOn},
+      {'headers': token_header}).toPromise().then((res: SetAvailablilityAPI) => {
       if (!res.success) {
         return reject(res.message);
       }
@@ -144,7 +146,8 @@ export class AppointmentService {
 
   everyone(auth_token: String): Promise<any> {
     // "Public" is a reserved word, so we go with the term "Everyone"
-    return this.http.get(PUBLIC_EVENTS_URL).toPromise().then((res: EventsAPI) => {
+    const token_header = new HttpHeaders().set('Authorization', 'Token ' + auth_token);
+    return this.http.get(PUBLIC_EVENTS_URL, {'headers': token_header}).toPromise().then((res: EventsAPI) => {
       if (!res.success) {
         return reject(res.message);
       }

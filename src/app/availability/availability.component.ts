@@ -1,5 +1,6 @@
 import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {AppointmentService, SetAvailablilityAPI} from '../appointment.service';
+import {AuthService} from "../auth.service";
 
 
 function getWeekNumber(d) {
@@ -47,14 +48,17 @@ export class AvailabilityComponent implements OnInit {
   }
 
   submitAvailability(): void {
+
     console.log('Submitting availability to server');
     console.log(this.selected_dates);
-    this.appointmentService.send_availability(Object.values(this.selected_dates)).then((res: SetAvailablilityAPI) => {
-      this.clear();
-      console.log(this.selected_dates);
-      this.set_availability();
-      return res;
-    }).then((res: SetAvailablilityAPI) => {
+    this.appointmentService.send_availability(this.authService.token, this.current.getMonth() + 1,
+      Object.keys(this.selected_dates)).then(
+        (res: SetAvailablilityAPI) => {
+            this.clear();
+            this.set_availability();
+            return res;
+          }
+    ).then((res: SetAvailablilityAPI) => {
       // TODO: Show error messages for places you couldn't change availability
       // IE: Places you have already inserted appointments
       console.log(res);
@@ -96,7 +100,7 @@ export class AvailabilityComponent implements OnInit {
      return days;
   }
 
-  constructor(public appointmentService: AppointmentService) { }
+  constructor(public appointmentService: AppointmentService, public authService: AuthService) { }
 
   ngOnInit() {
     this.clear();
@@ -105,9 +109,14 @@ export class AvailabilityComponent implements OnInit {
     this.set_display_dates();
   }
 
+  date_str(d: Date): string {
+    return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+  }
+
   toggle_date(d: Date): boolean {
     // Returns true if it is selected now, or false if it is not.
-    const k = d.toISOString().split('T')[0];
+    // const k = d.toISOString().split('T')[0];
+    const k = this.date_str(d);
     const add_date = d > this.today && !this.selected_dates[k];
 
     if (add_date) {
@@ -116,11 +125,11 @@ export class AvailabilityComponent implements OnInit {
       delete(this.selected_dates[k]);
     }
     this.set_selected_dates();
-    return this.selected_dates[d.toISOString().split('T')[0]];
+    return this.selected_dates[this.date_str(d)];
   }
 
   is_selected_date(d: Date): boolean {
-    return this.selected_dates[d.toISOString().split('T')[0]];
+    return this.selected_dates[this.date_str(d)];
   }
 
   set_display_dates(): void {

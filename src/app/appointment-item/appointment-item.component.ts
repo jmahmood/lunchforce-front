@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {LunchAppointment} from '../app.model';
 import {AppointmentService, EventsAPI} from '../appointment.service';
-import {AuthService} from "../auth.service";
+import {AuthService} from '../auth.service';
 
 @Component({
   selector: 'app-appointment-item',

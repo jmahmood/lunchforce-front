@@ -5,6 +5,7 @@ import {NgForm} from '@angular/forms';
 import {AppointmentService, EventsAPI} from './appointment.service';
 import {AuthService} from './auth.service';
 import {HttpErrorResponse} from "@angular/common/http";
+import {InitService} from "./init.service";
 
 interface LocationOptions {
   id: string;
@@ -21,7 +22,7 @@ interface FoodOptions {
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  providers: [AppointmentService, AuthService]
+  providers: [AppointmentService, AuthService, InitService]
 })
 
 
@@ -172,18 +173,23 @@ export class AppComponent implements OnInit {
 
   constructor(private modalService: BsModalService,
               public authService: AuthService,
-              public appointmentService: AppointmentService) {
+              public appointmentService: AppointmentService,
+              public initService: InitService,
+              ) {
 
   }
   ngOnInit() {
     this.authService.clear();
     this.state = 'login';
 
-    this.foodOptions = [
-      {'id': '1', 'name': 'Chinese'},
-      {'id': '2', 'name': 'Indian'},
-      {'id': '3', 'name': 'Turkish'}
-    ];
+    this.foodOptions = [];
+    this.initService.food_options().then( res => {
+      this.foodOptions = res.food_options;
+    }).catch( err => {
+      console.log('could not load food options');
+      console.log(err);
+    });
+
     this.locationOptions = [
       {'id': '1', 'name': 'Tokyo Office'},
       {'id': '2', 'name': 'Shinjuku Station'},
