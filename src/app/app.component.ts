@@ -109,6 +109,10 @@ export class AppComponent implements OnInit {
     }
   }
 
+  compareIdFn(l1: {id: string, name: string}, l2: {id: string, name: string}): boolean {
+    return l1.id === l2.id;
+  }
+
   onAppointmentJoined(): void {
     this.state = 'myevents';
     this.joinedAppointment = true;
@@ -185,15 +189,21 @@ export class AppComponent implements OnInit {
     this.foodOptions = [];
     this.initService.food_options().then( res => {
       this.foodOptions = res.food_options;
+      console.log(this.foodOptions);
+      return res;
     }).catch( err => {
       console.log('could not load food options');
       console.log(err);
     });
 
-    this.locationOptions = [
-      {'id': '1', 'name': 'Tokyo Office'},
-      {'id': '2', 'name': 'Shinjuku Station'},
-      {'id': '3', 'name': 'Koenji Station'}
-    ];
+    this.locationOptions = [];
+    this.initService.locations().then( res => {
+      this.locationOptions = res.locations;
+      console.log(this.locationOptions);
+      return res;
+    }).catch( err => {
+      console.log('could not load food options');
+      console.log(err);
+    });
   }
 }

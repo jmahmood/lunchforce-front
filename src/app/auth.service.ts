@@ -9,7 +9,7 @@ const LOGIN_URL = 'http://localhost:8000/api-token-auth/';
 const GET_PROFILE_URL = 'http://localhost:8000/api/my-profile/';
 // const LOGIN_URL = SERVER_URL + 'Login/Failure/';
 const INVITATION_URL = SERVER_URL + 'InvitationCode/Create/Success/';
-const PROFILE_UPDATE_URL = SERVER_URL + 'Profile/Success/';
+const PROFILE_UPDATE_URL = 'http://localhost:8000/api/update-profile/';
 const LOGOUT_URL = SERVER_URL + 'Logout/Success/';
 
 export interface LogoutAPI {
@@ -62,8 +62,8 @@ export interface ProfileDetails {
   profile: {
     email: string;
     name: string;
-    locations: string[];
-    whitelist: string[];
+    locations: [{id: string, name: string}];
+    whitelist: [{id: string, name: string}];
   };
   success: boolean;
   message: string;
@@ -130,6 +130,17 @@ export class AuthService {
       this.blank_enrollment();
   }
 
+  is_selected_location(location_id): boolean {
+    for (const l of this.profile.profile.locations) {
+      console.log('Comparing ' + location_id + ' to ' + l.id);
+      if (l.id === location_id) {
+        console.log('match found');
+        return true;
+      }
+    }
+    return false;
+  }
+
   send_invitation(invitation_post_data: InvitationPostAPI): Promise<any> {
     console.log(invitation_post_data);
     this.invitation.submitted = true;
@@ -160,7 +171,8 @@ export class AuthService {
   }
 
   send_profile_change(): Promise<any> {
-    return this.http.post(PROFILE_UPDATE_URL, this.profile).toPromise().then( (res: ProfileAPI) => {
+    const token_header = new HttpHeaders().set('Authorization', 'Token ' + this.token);
+    return this.http.post(PROFILE_UPDATE_URL, this.profile, {'headers': token_header}).toPromise().then( (res: ProfileAPI) => {
       this.profile.updated = res.success;
 
       if (!res.success) {
