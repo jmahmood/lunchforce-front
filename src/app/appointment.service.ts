@@ -14,7 +14,8 @@ export interface JoinEventAPI {
 export interface SearchAPI {
   success: boolean;
   message: string;
-  appointments: LunchAppointment[];
+  everyone: LunchAppointment[];
+  youonly: LunchAppointment[];
 }
 
 export interface EventsAPI {
@@ -45,16 +46,18 @@ export interface SetAvailablilityAPI {
 
 // http://localhost:8000/api/my-appointments/
 const SERVER_URL = 'http://localhost:8001/';
-const SEARCH_URL = SERVER_URL + 'Search/Success/';
-const JOIN_EVENT_URL = SERVER_URL + 'Events/Join/Success/';
+const SEARCH_URL = 'http://localhost:8000/api/search/';
+const ATTEND_EVENT_URL = 'http://localhost:8000/api/attend/';
 const MY_EVENTS_URL = 'http://localhost:8000/api/my-appointments/';
 const PUBLIC_EVENTS_URL = 'http://localhost:8000/api/public-appointments/';
+const INVITATEDTO_URL = 'http://localhost:8000/api/invitedto-appointments/';
 const MY_AVAILABILITY_URL = 'http://localhost:8000/api/my-availability/';
 const UPDATE_AVAILABILITY_URL = 'http://localhost:8000/api/update-availability/';
 
 
 @Injectable()
 export class AppointmentService {
+  myInvitations: EventsAPI;
   // Accessing appointments happens from here.
   searching = false;
   searchResults: SearchAPI = null;
@@ -103,8 +106,9 @@ export class AppointmentService {
 
   }
 
-  search(searchForm: NgForm): Promise<any> {
-    return this.http.post(SEARCH_URL, searchForm.value).toPromise().then(
+  search(auth_token: String, searchForm: NgForm): Promise<any> {
+    const token_header = new HttpHeaders().set('Authorization', 'Token ' + auth_token);
+    return this.http.post(SEARCH_URL, searchForm.value, {headers: token_header}).toPromise().then(
       (res: SearchAPI) => {
       console.log('Search results');
       console.log(res);
@@ -120,9 +124,10 @@ export class AppointmentService {
     });
   }
 
-  join(event_id: string): Promise<any> {
-    return this.http.post(JOIN_EVENT_URL,
-      JSON.stringify({'event_id': event_id})).toPromise().then((res: JoinEventAPI) => {
+  attend(auth_token: String, appointment_id: string): Promise<any> {
+    const token_header = new HttpHeaders().set('Authorization', 'Token ' + auth_token);
+    return this.http.post(ATTEND_EVENT_URL,
+      {'appointment_id': appointment_id}, {'headers': token_header}).toPromise().then((res: JoinEventAPI) => {
       console.log(res);
       if (!res.success) {
         return reject(res.message);
@@ -140,6 +145,20 @@ export class AppointmentService {
       this.myAppointments = res;
       console.log('my appointments');
       console.log(res);
+      return res;
+    });
+  }
+
+  invitations(auth_token: String): Promise<any> {
+    // "Public" is a reserved word, so we go with the term "Everyone"
+    const token_header = new HttpHeaders().set('Authorization', 'Token ' + auth_token);
+    return this.http.get(INVITATEDTO_URL, {'headers': token_header}).toPromise().then((res: EventsAPI) => {
+      if (!res.success) {
+        return reject(res.message);
+      }
+      console.log('my invitations');
+      console.log(res);
+      this.myInvitations = res;
       return res;
     });
   }

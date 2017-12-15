@@ -19,18 +19,19 @@
           <li (click)="goEnrollment()" [ngClass]="{'active': state == 'enrollment'}"><a href="#">Enrollment</a></li>
         </ul>
         <ng-template #WelcomeNav>
-          <ul class="nav navbar-nav"><li class="navbar-text" >Welcome back {{ authService.profile.name }}</li></ul>
+          <ul class="nav navbar-nav"><li class="navbar-text" >Welcome back {{ authService.profile.profile.name }}</li></ul>
         </ng-template>
 
         <ul class="nav navbar-nav navbar-right" *ngIf="authService.login.success">
           <!-- <li class="navbar-text" >Welcome back {{ login.email }}</li> -->
           <li [ngClass]="{'active': state == 'myevents'}" (click)="goMyEvents()"><a href="#"><span class="glyphicon glyphicon-th-list"></span> My Events</a></li>
-          <li [ngClass]="{'active': state == 'publicevents'}" (click)="goPublicEvents()"><a href="#"><span class="glyphicon glyphicon-calendar"></span> Public Events</a></li>
+          <li [ngClass]="{'active': state == 'publicevents'}" (click)="goPublicEvents()"><a href="#"><span class="glyphicon glyphicon-calendar"></span> Public <span class="badge">{{appointmentService.everyoneAppointments.appointments.length}}</span></a></li>
+          <li [ngClass]="{'active': state == 'invitedto'}" (click)="goInvitedToEvents()"><a href="#"><span class="glyphicon glyphicon-calendar"></span> Invitations <span class="badge">{{appointmentService.myInvitations.appointments.length}}</span></a></li>
           <li [ngClass]="{'active': state == 'availability'}" (click)="goAvailability()"><a href="#"><span class="glyphicon glyphicon-time"></span> Availability</a></li>
 
           <li [ngClass]="{'active': state == 'profile'}" (click)="goProfile()"><a href="#"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
           <li [ngClass]="{'active': state == 'search'}" (click)="goSearch()"><a href="#"><span class="glyphicon glyphicon-search"></span> Search</a></li>
-          <li [ngClass]="{'active': state == 'invitationsuccess' || state == 'invitation'}" (click)="goInvitation()"><a href="#"><span class="glyphicon glyphicon-share"></span> Invite</a></li>
+          <li [ngClass]="{'active': state == 'invitationsuccess' || state == 'invitation'}" (click)="goInvitation()"><a href="#"><span class="glyphicon glyphicon-share"></span> Introduce</a></li>
           <li [ngClass]="{'active': state == 'logout'}" (click)="goLogout()"><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
         </ul>
     </div><!-- /.container-fluid -->
@@ -160,7 +161,7 @@
           <select multiple="multiple" id="searchLocation" name="location" class="form-control" ngModel>
             <option *ngFor="let locationOption of locationOptions"
                     id="searchoption_{{locationOption.id}}"
-                    [ngValue]="locationOption.name">{{locationOption.name}}</option>
+                    [ngValue]="locationOption.id">{{locationOption.name}}</option>
           </select>
         </div>
 
@@ -305,6 +306,18 @@
       </div>
       <app-appointment-item [appointments]="appointmentService.everyoneAppointments.appointments" [allowJoiningEvent]=true (joinEvent)="onAppointmentJoined($event)">
         There are no public events currently available.
+      </app-appointment-item>
+    </div>
+
+
+    <div *ngIf="state=='invitedto'">
+      <div class="alert alert-error" role="alert" [hidden]="!joinedAppointment">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only">Successfully joined:</span>
+        You successfully joined the event (xxx)
+      </div>
+      <app-appointment-item [appointments]="appointmentService.myInvitations.appointments" [allowJoiningEvent]=true (joinEvent)="onAppointmentJoined($event)">
+        There are no invitations outstanding for you.
       </app-appointment-item>
     </div>
 </div>

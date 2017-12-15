@@ -15,15 +15,15 @@ export class AppointmentItemComponent implements OnInit {
   @Output() joinEvent = new EventEmitter<Boolean>();
 
 
-  joinAppointment(event_id: string): void {
-    this.appointmentService.join(event_id).then( () => {
+  joinAppointment(appointment_id: string): void {
+    this.appointmentService.attend(this.authService.token, appointment_id).then( () => {
         return this.appointmentService.my(this.authService.token); // My appointments are refreshed.
       }
     ).then((res: EventsAPI) => {
       /*  This stuff only affects this particular component. */
-      for (const lunch_event of res.appointments){
-        if (lunch_event.id === event_id) {
-          lunch_event.highlight = true;
+      for (const appointment of res.appointments){
+        if (appointment.id === appointment_id) {
+          appointment.highlight = true;
         }
       }
       this.joinEvent.emit(true);

@@ -4,8 +4,8 @@ import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {NgForm} from '@angular/forms';
 import {AppointmentService, EventsAPI} from './appointment.service';
 import {AuthService} from './auth.service';
-import {HttpErrorResponse} from "@angular/common/http";
-import {InitService} from "./init.service";
+import {InitService} from './init.service';
+
 
 interface LocationOptions {
   id: string;
@@ -32,6 +32,7 @@ export class AppComponent implements OnInit {
   foodOptions: FoodOptions[];
   locationOptions: LocationOptions[];
   errormodal_message: string;
+
 
   @ViewChild('errorModal') private errorModal: TemplateRef<any>;
   @ViewChild('searchForm') searchForm: NgForm;
@@ -68,11 +69,24 @@ export class AppComponent implements OnInit {
   }
 
   goSearch() {
+    setTimeout(
+      () => {
+          this.searchForm.setValue({'date': new Date().toISOString().split('T')[0],
+                  'location': [],
+                  'bothsexes': false,
+                  'male': false,
+                  'female': false});
+      }, 250
+    );
     this.state = 'search';
   }
 
   goPublicEvents() {
     this.state = 'publicevents';
+  }
+
+  goInvitedToEvents() {
+    this.state = 'invitedto';
   }
 
   goMyEvents() {
@@ -105,7 +119,7 @@ export class AppComponent implements OnInit {
     }
 
     if (this.state === 'search' && this.appointmentService.searchResults) {
-      return this.appointmentService.searchResults.appointments;
+      return this.appointmentService.searchResults.youonly.concat(this.appointmentService.searchResults.everyone);
     }
   }
 
@@ -120,8 +134,8 @@ export class AppComponent implements OnInit {
   }
 
   onSubmitSearch(): void {
-    console.log('trigger search')
-    this.appointmentService.search(this.searchForm).catch((err) => {
+    console.log('trigger search');
+    this.appointmentService.search(this.authService.token, this.searchForm).catch((err) => {
       console.log('Search Error!');
       console.log(err);
     });
@@ -163,7 +177,8 @@ export class AppComponent implements OnInit {
       const p2 = this.appointmentService.everyone(this.authService.token);
       const p3 = this.appointmentService.available(this.authService.token);
       const p4 = this.authService.my_profile();
-      return Promise.all([p1, p2, p3, p4]);
+      const p5 = this.appointmentService.invitations(this.authService.token);
+      return Promise.all([p1, p2, p3, p4, p5]);
     }).then(() => {
       this.state = 'myevents';
     }).catch((err) => {

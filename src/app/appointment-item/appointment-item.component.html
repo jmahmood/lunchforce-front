@@ -4,9 +4,10 @@
   <th>Date</th>
   <th>Location</th>
   <th>People Attending</th>
+  <th *ngIf="allowJoiningEvent">Status</th>
 </tr>
 <tr *ngFor="let app of appointments; let i=index" [ngClass]="{'highlight': app.highlight}">
-  <td>{{i}}: {{app.title}}</td>
+  <td>{{app.title}}</td>
   <td>{{app.date | date:'yyyy-MM-dd'}}</td>
   <td>{{app.location}}</td>
   <td>
