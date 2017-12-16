@@ -8,6 +8,12 @@ import { ModalModule } from 'ngx-bootstrap';
 import { SalesforceOnlyDirective } from './salesforce-only.directive';
 import { AppointmentItemComponent } from './appointment-item/appointment-item.component';
 import { AvailabilityComponent } from './availability/availability.component';
+import { MyProfileComponent } from './my-profile/my-profile.component';
+import { IntroductionComponent } from './introduction/introduction.component';
+import { InvitationSuccessComponent } from './invitation-success/invitation-success.component';
+import { EnrollmentComponent } from './enrollment/enrollment.component';
+import { MyEventsComponent } from './my-events/my-events.component';
+import { SearchComponent } from './search/search.component';
 
 @NgModule({
   declarations: [
@@ -15,6 +21,12 @@ import { AvailabilityComponent } from './availability/availability.component';
     SalesforceOnlyDirective,
     AppointmentItemComponent,
     AvailabilityComponent,
+    MyProfileComponent,
+    IntroductionComponent,
+    InvitationSuccessComponent,
+    EnrollmentComponent,
+    MyEventsComponent,
+    SearchComponent,
   ],
   imports: [
     BrowserModule,

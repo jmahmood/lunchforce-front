@@ -15,97 +15,35 @@
 
       <!-- Collect the nav links, forms, and other content for toggling -->
         <ul class="nav navbar-nav" *ngIf="!authService.login.success; else WelcomeNav">
-          <li (click)="goLogin()" [ngClass]="{'active': state == 'login'}"><a href="#">Login <span class="sr-only">(current)</span></a></li>
-          <li (click)="goEnrollment()" [ngClass]="{'active': state == 'enrollment'}"><a href="#">Enrollment</a></li>
+          <li (click)="navService.login()" [ngClass]="{'active': state == 'login'}"><a href="#">Login <span class="sr-only">(current)</span></a></li>
+          <li (click)="navService.enrollment()" [ngClass]="{'active': state == 'enrollment'}"><a href="#">Enrollment</a></li>
         </ul>
         <ng-template #WelcomeNav>
           <ul class="nav navbar-nav"><li class="navbar-text" >Welcome back {{ authService.profile.profile.name }}</li></ul>
         </ng-template>
 
         <ul class="nav navbar-nav navbar-right" *ngIf="authService.login.success">
-          <!-- <li class="navbar-text" >Welcome back {{ login.email }}</li> -->
-          <li [ngClass]="{'active': state == 'myevents'}" (click)="goMyEvents()"><a href="#"><span class="glyphicon glyphicon-th-list"></span> My Events</a></li>
-          <li [ngClass]="{'active': state == 'publicevents'}" (click)="goPublicEvents()"><a href="#"><span class="glyphicon glyphicon-calendar"></span> Public <span class="badge">{{appointmentService.everyoneAppointments.appointments.length}}</span></a></li>
-          <li [ngClass]="{'active': state == 'invitedto'}" (click)="goInvitedToEvents()"><a href="#"><span class="glyphicon glyphicon-calendar"></span> Invitations <span class="badge">{{appointmentService.myInvitations.appointments.length}}</span></a></li>
-          <li [ngClass]="{'active': state == 'availability'}" (click)="goAvailability()"><a href="#"><span class="glyphicon glyphicon-time"></span> Availability</a></li>
-
-          <li [ngClass]="{'active': state == 'profile'}" (click)="goProfile()"><a href="#"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
-          <li [ngClass]="{'active': state == 'search'}" (click)="goSearch()"><a href="#"><span class="glyphicon glyphicon-search"></span> Search</a></li>
-          <li [ngClass]="{'active': state == 'invitationsuccess' || state == 'invitation'}" (click)="goInvitation()"><a href="#"><span class="glyphicon glyphicon-share"></span> Introduce</a></li>
-          <li [ngClass]="{'active': state == 'logout'}" (click)="goLogout()"><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+          <li [ngClass]="{'active': navService.state == 'myevents'}" (click)="navService.myevents()"><a href="#"><span class="glyphicon glyphicon-th-list"></span> My Events</a></li>
+          <li [ngClass]="{'active': navService.state == 'publicevents'}" (click)="navService.publicevents()"><a href="#"><span class="glyphicon glyphicon-calendar"></span> Public <span class="badge">{{appointmentService.everyoneAppointments.appointments.length}}</span></a></li>
+          <li [ngClass]="{'active': navService.state == 'invitedto'}" (click)="navService.invitedto()"><a href="#"><span class="glyphicon glyphicon-calendar"></span> Invitations <span class="badge">{{appointmentService.myInvitations.appointments.length}}</span></a></li>
+          <li [ngClass]="{'active': navService.state == 'availability'}" (click)="navService.availability()"><a href="#"><span class="glyphicon glyphicon-time"></span> Availability</a></li>
+          <li [ngClass]="{'active': navService.state == 'profile'}" (click)="navService.profile()"><a href="#"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
+          <li [ngClass]="{'active': navService.state == 'search'}" (click)="navService.search()"><a href="#"><span class="glyphicon glyphicon-search"></span> Search</a></li>
+          <li [ngClass]="{'active': navService.state == 'invitationsuccess' || navService.state == 'invitation'}" (click)="navService.invitation()"><a href="#"><span class="glyphicon glyphicon-share"></span> Introduce</a></li>
+          <li [ngClass]="{'active': navService.state == 'logout'}" (click)="goLogout()"><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
         </ul>
     </div><!-- /.container-fluid -->
   </nav>
-  <div class="container">
-    <div *ngIf="state=='waiting'">waiting...</div>
-    <div *ngIf="state=='loadmyevents'">loading your upcoming lunch data...</div>
-    <div *ngIf="state=='enrollment'">
-      <form id="enrollmentForm" (ngSubmit)="onSubmitEnrollment();" #enrollmentForm="ngForm">
-          <h2>Enrollment: </h2>
-            <!-- Create an account, select a place. -->
-          <div class="alert alert-danger" role="alert" [hidden]="authService.enrollment.error_messages.length == 0">
-            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-            <span class="sr-only">Error:</span>
-            <span *ngFor="let err_msg of authService.enrollment.error_messages">
-                {{err_msg}}<br>
-            </span>
-          </div>
+  <div class="container" [ngSwitch]="navService.state">
+    <div *ngSwitchCase="'waiting'">waiting...</div>
 
+    <div *ngSwitchCase="'loadmyevents'">loading your upcoming lunch data...</div>
 
-          <div class="form-group">
-            <label for="enrollmentEmail">Email address</label>
-            <input type="email" class="form-control" id="enrollmentEmail" name="enrollmentEmail" placeholder="Email@example.org"
-                   ngModel required #enrollmentEmail="ngModel" email="true" appSalesforceOnly>
-            <div [hidden]="enrollmentEmail.valid || enrollmentEmail.pristine && !authService.enrollment.submitted"
-                 class="alert alert-danger">
-              You must enter a valid email.
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="enrollmentPassword">Password</label>
-            <input type="password" class="form-control" id="enrollmentPassword" name="enrollmentPassword"
-                   placeholder="Password"
-                   ngModel minlength="8" #enrollmentPassword="ngModel"
-                   required>
-            <div [hidden]="enrollmentPassword.valid || enrollmentPassword.pristine"
-                 class="alert alert-danger">
-              You must enter a password of more than 8 characters.
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="enrollmentInvitationCode">Invitation Code</label>
-            <input type="text" class="form-control" id="enrollmentInvitationCode" name="enrollmentInvitationCode"
-                   placeholder="abc-123" ngModel required>
-            <div [hidden]="enrollmentPassword.valid"
-                 class="alert alert-warning">
-              You cannot enroll without an invitation code
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="selectWhitelist">I like</label>
-            <select multiple="multiple" id="selectWhitelist" name="selectWhitelist" class="form-control"
-                    ngModel>
-              <option *ngFor="let foodOption of foodOptions" [ngValue]="foodOption.name">{{foodOption.name}}</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="selectLocation">I can meet you near</label>
-            <select multiple="multiple" id="selectLocation" name="selectLocation" class="form-control"
-                    ngModel>
-              <option *ngFor="let locationOption of locationOptions" id="{{locationOption.id}}" [ngValue]="locationOption.name">{{locationOption.name}}</option>
-            </select>
-          </div>
-
-
-          <button class="btn btn-default">Submit</button>
-        </form>
+    <div *ngSwitchCase="'enrollment'">
+      <app-enrollment [foodOptions]="foodOptions" [locationOptions]="locationOptions"></app-enrollment>
     </div>
 
-    <div *ngIf="state=='login'">
+    <div *ngSwitchCase="'login'">
       <div class="col-sm-6">
         <form id="loginForm" (submit)="onSubmitLogin()" #loginForm="ngForm">
 
@@ -141,142 +79,54 @@
         <p>Find people and eat lunch with them.</p>
       </div>
     </div>
-    <div class="search" *ngIf="state=='search'" >
-      <form id="searchForm" (ngSubmit)="onSubmitSearch()" #searchForm="ngForm">
-        <div class="alert alert-danger" role="alert" *ngIf="appointmentService.searchResults != null && appointmentService.searchResults.message">
-          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-          <span class="sr-only">Error:</span>
-          <span>
-              {{appointmentService.searchResults.message}}<br>
-          </span>
-        </div>
 
-        <div class="form-group">
-          <label for="searchDate">Date</label>
-          <input type="date" class="form-control" id="searchDate" name="date" ngModel>
-        </div>
+    <div *ngSwitchCase="'search'" class="search">
+      <app-search [foodOptions]="foodOptions" [locationOptions]="locationOptions"></app-search>
 
-        <div class="form-group">
-          <label for="selectLocation">Location</label>
-          <select multiple="multiple" id="searchLocation" name="location" class="form-control" ngModel>
-            <option *ngFor="let locationOption of locationOptions"
-                    id="searchoption_{{locationOption.id}}"
-                    [ngValue]="locationOption.id">{{locationOption.name}}</option>
-          </select>
-        </div>
-
-        <div class="advanced-controls">
-          <div class="checkbox">
-            <label>
-              <input name="bothsexes" type="checkbox" ngModel> ⚥
-            </label>
-            <label>
-              <input name="male" type="checkbox" ngModel> ♂
-            </label>
-            <label>
-              <input name="female" type="checkbox" ngModel> ♀
-            </label>
-          </div>
-        </div>
-
-        <button type="submit" class="btn btn-default">Submit</button>
-      </form>
-
-      <app-appointment-item *ngIf="searching" [appointments]="appointments()" [allowJoiningEvent]=true (joinEvent)="onAppointmentJoined($event)">
-        No search results found!  Please retry your search.
-      </app-appointment-item>
     </div>
 
-    <div *ngIf="state=='invitation'">
-      <div class="alert alert-danger" role="alert" [hidden]="authService.invitation.error_messages.length == 0">
+    <div *ngSwitchCase="'invitation'">
+      <app-introduction></app-introduction>
+    </div>
+
+    <div *ngSwitchCase="'invitationsuccess'">
+      <app-invitation-success></app-invitation-success>
+    </div>
+
+    <div *ngSwitchCase="'profile'">
+      <app-my-profile [foodOptions]="foodOptions" [locationOptions]="locationOptions"></app-my-profile>
+    </div>
+
+    <div *ngSwitchCase="'myevents'">
+      <app-my-events></app-my-events>
+    </div>
+
+    <div *ngSwitchCase="'availability'">
+          <app-availability></app-availability>
+    </div>
+
+    <div *ngSwitchCase="'publicevents'">
+      <div class="alert alert-error" role="alert" [hidden]="!joinedAppointment">
         <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-        <span class="sr-only">Error:</span>
-        <span *ngFor="let err_msg of authService.invitation.error_messages">
-            {{err_msg}}<br>
-        </span>
-      </div>
-
-
-      <form id="invitationForm" (ngSubmit)="onSubmitInvitation()" #invitationForm="ngForm">
-        <div class="form-group">
-          <label for="InvitationEmail">Who should we invite?</label>
-          <input type="email" class="form-control" id="InvitationEmail" name="invitationEmail" placeholder="Email"
-                 ngModel #invitationEmail="ngModel"  email="true" appSalesforceOnly
-                 required>
-        </div>
-        <button type="submit" class="btn btn-default">Submit</button>
-      </form>
-    </div>
-    <div *ngIf="state=='invitationsuccess'">
-      <p>You successfully submitted a request for an invitation code. <a href="#" (click)="goInvitation()">Make another request?</a></p>
-      <div class="form-group">
-          <label for="InvitationEmailOutput">Invitee</label>
-          <input type="email" class="form-control" id="InvitationEmailOutput" name="InvitationEmailOutput" [(ngModel)]="authService.invitation.email" disabled>
-      </div>
-      <div class="form-group">
-          <label for="InvitationCodeOutput">Invitation Code</label>
-          <input type="text" class="form-control" id="InvitationCodeOutput" name="InvitationCodeOutput" [(ngModel)]="authService.invitation.invitation_code" disabled>
-      </div>
-    </div>
-    <form id="profileForm" *ngIf="state=='profile'" (submit)="onSubmitProfileForm();">
-        <h2>Profile: </h2>
-
-        <div class="alert alert-success" role="alert" [hidden]="!authService.profile.updated">
-          <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
-          <span class="sr-only">Error:</span>
-          Profile update completed.
-        </div>
-
-        <div class="alert alert-danger" role="alert" [hidden]="!authService.profile.message">
-          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-          <span class="sr-only">Error:</span>
-          <span>
-              {{authService.profile.message}}<br>
-          </span>
-        </div>
-
-        <div class="form-group">
-          <label for="enrollmentEmail">Email address</label>
-          <input type="email" class="form-control" id="profileEmail" name="profileEmail" placeholder="Email"
-                 [(ngModel)]="authService.profile.profile.email" disabled>
-        </div>
-
-        <div class="form-group">
-          <label for="selectWhitelist">I like</label>
-          <select multiple="multiple" id="profileWhiteList" name="profileWhiteList" class="form-control"
-                  [(ngModel)]="authService.profile.profile.whitelist"  [compareWith]="compareIdFn">
-            <option *ngFor="let foodOption of foodOptions" id="profile_{{foodOption.id}}" [ngValue]="foodOption">{{foodOption.name}}</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="selectLocation">I can meet you near</label>
-          <select multiple="multiple" id="profileLocation" name="profileLocation" class="form-control"
-                  [(ngModel)]="authService.profile.profile.locations" [compareWith]="compareIdFn">
-            <option *ngFor="let locationOption of locationOptions" id="profile_{{locationOption.id}}" [ngValue]="locationOption">{{locationOption.name}}</option>
-          </select>
-        </div>
-
-
-        <button class="btn btn-default">Submit</button>
-      </form>
-    <div *ngIf="state=='myevents'">
-      <div class="alert alert-success" role="alert" [hidden]="!joinedAppointment">
-        <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
         <span class="sr-only">Successfully joined:</span>
         You successfully joined the event (xxx)
       </div>
+      <app-appointment-item [appointments]="appointmentService.everyoneAppointments.appointments" [allowJoiningEvent]=true (joinEvent)="onAppointmentJoined($event)">
+        There are no public events currently available.
+      </app-appointment-item>
+    </div>
 
-      <strong>My Upcoming Lunches: </strong>
-
-      <app-appointment-item [appointments]="appointmentService.myAppointments.appointments" [allowJoiningEvent]=false *ngIf="appointmentService.myAppointments && appointmentService.myAppointments.appointments.length > 0"></app-appointment-item>
-      <div *ngIf="appointmentService.myAppointments.appointments.length == 0">
-        <h2>You have no lunches!</h2>
-        <ol class="list-group">
-          <li class="list-group-item" (click)="goPublicEvents()"><a href="#"><span class="glyphicon glyphicon-calendar"></span> Find upcoming lunches near you?</a></li>
-          <li class="list-group-item" (click)="goAvailability()"><a href="#"><span class="glyphicon glyphicon-time"></span> Add availability for lunch?</a></li>
-        </ol>
+    <div *ngSwitchCase="'invitedto'">
+      <div class="alert alert-error" role="alert" [hidden]="!joinedAppointment">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only">Successfully joined:</span>
+        You successfully joined the event (xxx)
       </div>
+      <app-appointment-item [appointments]="appointmentService.myInvitations.appointments" [allowJoiningEvent]=true (joinEvent)="onAppointmentJoined($event)">
+        There are no invitations outstanding for you.
+      </app-appointment-item>
+    </div>
+
 
     <ng-template #errorModal>
       <div class="modal-header">
@@ -290,34 +140,4 @@
       </div>
     </ng-template>
 
-  </div>
-    <div *ngIf="state=='availability'">
-          <app-availability></app-availability>
-    </div>
-    <div *ngIf="state=='invitations'">
-      <!-- Not yet built. -->
-    </div>
-
-    <div *ngIf="state=='publicevents'">
-      <div class="alert alert-error" role="alert" [hidden]="!joinedAppointment">
-        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-        <span class="sr-only">Successfully joined:</span>
-        You successfully joined the event (xxx)
-      </div>
-      <app-appointment-item [appointments]="appointmentService.everyoneAppointments.appointments" [allowJoiningEvent]=true (joinEvent)="onAppointmentJoined($event)">
-        There are no public events currently available.
-      </app-appointment-item>
-    </div>
-
-
-    <div *ngIf="state=='invitedto'">
-      <div class="alert alert-error" role="alert" [hidden]="!joinedAppointment">
-        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-        <span class="sr-only">Successfully joined:</span>
-        You successfully joined the event (xxx)
-      </div>
-      <app-appointment-item [appointments]="appointmentService.myInvitations.appointments" [allowJoiningEvent]=true (joinEvent)="onAppointmentJoined($event)">
-        There are no invitations outstanding for you.
-      </app-appointment-item>
-    </div>
 </div>

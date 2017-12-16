@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {AppointmentService, SetAvailablilityAPI} from '../appointment.service';
-import {AuthService} from "../auth.service";
+import {AuthService} from '../auth.service';
 
 
 function getWeekNumber(d) {

@@ -18,6 +18,16 @@ export interface LocationsAPI {
   message: string;
 }
 
+export interface LocationOptions {
+  id: string;
+  name: string;
+}
+
+export interface FoodOptions {
+  id: string;
+  name: string;
+}
+
 @Injectable()
 export class InitService {
 

@@ -141,7 +141,7 @@ export class AuthService {
     return false;
   }
 
-  send_invitation(invitation_post_data: InvitationPostAPI): Promise<any> {
+  send_introduction(invitation_post_data: InvitationPostAPI): Promise<any> {
     console.log(invitation_post_data);
     this.invitation.submitted = true;
     this.login.submitted = true;
