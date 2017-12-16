@@ -1,0 +1,16 @@
+<div class="alert alert-success" role="alert" [hidden]="!joinedAppointment">
+  <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
+  <span class="sr-only">Successfully joined:</span>
+  You successfully joined the event (xxx)
+</div>
+
+<strong>My Upcoming Lunches: </strong>
+
+<app-appointment-item [appointments]="appointmentService.myAppointments.appointments" [allowJoiningEvent]=false *ngIf="appointmentService.myAppointments && appointmentService.myAppointments.appointments.length > 0"></app-appointment-item>
+<div *ngIf="appointmentService.myAppointments.appointments.length == 0">
+  <h2>You have no lunches!</h2>
+  <ol class="list-group">
+    <li class="list-group-item" (click)="goPublicEvents()"><a href="#"><span class="glyphicon glyphicon-calendar"></span> Find upcoming lunches near you?</a></li>
+    <li class="list-group-item" (click)="goAvailability()"><a href="#"><span class="glyphicon glyphicon-time"></span> Add availability for lunch?</a></li>
+  </ol>
+</div>

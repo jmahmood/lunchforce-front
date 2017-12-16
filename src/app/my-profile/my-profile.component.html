@@ -1,0 +1,42 @@
+<form id="profileForm" (submit)="onSubmitProfileForm();">
+    <h2>Profile: </h2>
+
+    <div class="alert alert-success" role="alert" [hidden]="!authService.profile.updated">
+      <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      Profile update completed.
+    </div>
+
+    <div class="alert alert-danger" role="alert" [hidden]="!authService.profile.message">
+      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      <span>
+          {{authService.profile.message}}<br>
+      </span>
+    </div>
+
+    <div class="form-group">
+      <label for="profileEmail">Email address</label>
+      <input type="email" class="form-control" id="profileEmail" name="profileEmail" placeholder="Email"
+             [(ngModel)]="authService.profile.profile.email" disabled>
+    </div>
+
+    <div class="form-group">
+      <label for="profileWhiteList">I like</label>
+      <select multiple="multiple" id="profileWhiteList" name="profileWhiteList" class="form-control"
+              [(ngModel)]="authService.profile.profile.whitelist"  [compareWith]="compareIdFn">
+        <option *ngFor="let foodOption of foodOptions" id="profile_{{foodOption.id}}" [ngValue]="foodOption">{{foodOption.name}}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="profileLocation">I can meet you near</label>
+      <select multiple="multiple" id="profileLocation" name="profileLocation" class="form-control"
+              [(ngModel)]="authService.profile.profile.locations" [compareWith]="compareIdFn">
+        <option *ngFor="let locationOption of locationOptions" id="profile_{{locationOption.id}}" [ngValue]="locationOption">{{locationOption.name}}</option>
+      </select>
+    </div>
+
+
+    <button class="btn btn-default">Submit</button>
+  </form>

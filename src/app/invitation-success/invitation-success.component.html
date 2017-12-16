@@ -1,0 +1,9 @@
+<p>You successfully submitted a request for an invitation code. <a href="#" (click)="goInvitation()">Make another request?</a></p>
+<div class="form-group">
+    <label for="InvitationEmailOutput">Invitee</label>
+    <input type="email" class="form-control" id="InvitationEmailOutput" name="InvitationEmailOutput" [(ngModel)]="authService.invitation.email" disabled>
+</div>
+<div class="form-group">
+    <label for="InvitationCodeOutput">Invitation Code</label>
+    <input type="text" class="form-control" id="InvitationCodeOutput" name="InvitationCodeOutput" [(ngModel)]="authService.invitation.invitation_code" disabled>
+</div>

@@ -1,0 +1,44 @@
+<form id="searchForm" (ngSubmit)="onSubmitSearch()" #searchForm="ngForm">
+  <div class="alert alert-danger" role="alert" *ngIf="appointmentService.searchResults != null && appointmentService.searchResults.message">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <span class="sr-only">Error:</span>
+    <span>
+        {{appointmentService.searchResults.message}}<br>
+    </span>
+  </div>
+
+  <div class="form-group">
+    <label for="searchDate">Date</label>
+    <input type="date" class="form-control" id="searchDate" name="date" ngModel>
+  </div>
+
+  <div class="form-group">
+    <label for="searchLocation">Location</label>
+      <select multiple="multiple" id="searchLocation" name="location" class="form-control"
+              [compareWith]="compareIdFn" ngModel>
+      <option *ngFor="let locationOption of locationOptions"
+              [ngValue]="locationOption">{{locationOption.name}}</option>
+    </select>
+  </div>
+
+  <div class="advanced-controls">
+    <div class="checkbox">
+      <label>
+        <input name="bothsexes" type="checkbox" ngModel> ⚥
+      </label>
+      <label>
+        <input name="male" type="checkbox" ngModel> ♂
+      </label>
+      <label>
+        <input name="female" type="checkbox" ngModel> ♀
+      </label>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-default">Submit</button>
+</form>
+
+<app-appointment-item *ngIf="searching" [appointments]="appointments()"
+                      [allowJoiningEvent]=true (joinEvent)="onAppointmentJoined($event)">
+  No search results found!  Please retry your search.
+</app-appointment-item>
