@@ -10,19 +10,19 @@ import {NgForm} from '@angular/forms';
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.css']
 })
-export class SearchComponent implements AfterContentChecked {
+export class SearchComponent implements OnInit {
   @Input() foodOptions: FoodOptions[];
   @Input() locationOptions: LocationOptions[];
   @Output() joinEvent: EventEmitter<boolean>;
   @ViewChild('searchForm') searchForm: NgForm;
-
-
-  searching(): boolean {
-    return this.appointmentService.searching;
-  }
+  searching = false;
 
   appointments() {
-      return this.appointmentService.searchResults.youonly.concat(this.appointmentService.searchResults.everyone);
+    // Returns a list of all possible appointments for search conditions provided.
+    if (!this.appointmentService.searchResults){
+      return [];
+    }
+    return this.appointmentService.searchResults.youonly.concat(this.appointmentService.searchResults.everyone);
   }
 
   onAppointmentJoined(): void {
@@ -32,6 +32,7 @@ export class SearchComponent implements AfterContentChecked {
 
   onSubmitSearch(): void {
     console.log('trigger search');
+    this.searching = true;
     this.appointmentService.search(this.authService.token, this.searchForm).catch((err) => {
       console.log('Search Error!');
       console.log(err);
@@ -47,12 +48,10 @@ export class SearchComponent implements AfterContentChecked {
               public navService: NavService) {
   }
 
-  ngAfterContentChecked() {
-    this.searchForm.setValue({'date': new Date().toISOString().split('T')[0],
-            'location': [],
-            'bothsexes': false,
-            'male': false,
-            'female': false});
+  ngOnInit() {
+    setTimeout( () => {
+      this.searchForm.form.controls.date.setValue(new Date().toISOString().split('T')[0]);
+    }, 1500);
   }
 
 }

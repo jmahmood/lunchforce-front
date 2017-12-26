@@ -8,10 +8,13 @@
 
 <form id="introductionForm" (ngSubmit)="onSubmitIntroduction()" #introductionForm="ngForm">
   <div class="form-group">
-    <label for="InvitationEmail">Who should we invite?</label>
-    <input type="email" class="form-control" id="InvitationEmail" name="invitationEmail" placeholder="Email"
-           ngModel #invitationEmail="ngModel"  email="true" appSalesforceOnly
-           required>
+    <label for="InvitationEmail">Who do you want to introduce?</label>
+    <input type="email" class="form-control" id="InvitationEmail" name="invitationEmail" placeholder="Email@example.org"
+           ngModel required #invitationEmail="ngModel"  email="true" appSalesforceOnly>
+      <div [hidden]="invitationEmail.valid || invitationEmail.pristine" class="alert alert-danger">
+        You must enter a valid email.  You can only register with a salesforce.com email.
+      </div>
+
   </div>
-  <button type="submit" class="btn btn-default">Submit</button>
+  <button type="submit" class="btn btn-default" [disabled]="!invitationEmail.valid || invitationEmail.pristine">Submit</button>
 </form>

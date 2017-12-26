@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {reject} from 'q';
+import {CookieService} from "ngx-cookie-service";
 
 const SERVER_URL = 'http://localhost:8001/';
 const ENROLLMENT_URL = SERVER_URL + 'Enrollment/Success/';
@@ -142,6 +143,10 @@ export class AuthService {
   }
 
   send_introduction(invitation_post_data: InvitationPostAPI): Promise<any> {
+    // Ensure logged in.
+    // Add API to backend
+    // Ensure this is checked when someone enrolls.
+    // Only Salesforce.com emails are acceptable
     console.log(invitation_post_data);
     this.invitation.submitted = true;
     this.login.submitted = true;
@@ -213,6 +218,15 @@ export class AuthService {
       console.log(res);
       this.token = res.token;
     });
+ }
+
+ check_cookies(cookieService: CookieService): boolean {
+   const token = cookieService.get('login_token');
+   if (token) {
+     this.token = token;
+     return true;
+   }
+   return false;
  }
 
   logout(): Promise<any> {

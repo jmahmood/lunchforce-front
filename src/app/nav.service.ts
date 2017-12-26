@@ -9,8 +9,8 @@ export class NavService {
     return this.state === to_check;
   }
 
-  invitationsuccess(): void {
-    this.state = 'invitationsuccess';
+  introductionsuccess(): void {
+    this.state = 'introductionsuccess';
   }
 
   loadmyevents(): void {
@@ -25,8 +25,8 @@ export class NavService {
     this.state = 'waiting';
   }
 
-  invitation(): void {
-    this.state = 'invitation';
+  introduction(): void {
+    this.state = 'introduction';
   }
 
   availability(): void {

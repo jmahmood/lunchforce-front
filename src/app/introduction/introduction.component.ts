@@ -19,10 +19,10 @@ export class IntroductionComponent implements OnInit {
     this.navService.waiting();
     console.log('waiting');
     this.authService.send_introduction(this.introductionForm.value).then(() => {
-      this.navService.invitationsuccess();
+      this.navService.introductionsuccess();
       console.log('success');
     }).catch(() => {
-      this.navService.invitation();
+      this.navService.introduction();
       console.log('failure');
     });
   }

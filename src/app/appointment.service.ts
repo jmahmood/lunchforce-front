@@ -45,7 +45,6 @@ export interface SetAvailablilityAPI {
 
 
 // http://localhost:8000/api/my-appointments/
-const SERVER_URL = 'http://localhost:8001/';
 const SEARCH_URL = 'http://localhost:8000/api/search/';
 const ATTEND_EVENT_URL = 'http://localhost:8000/api/attend/';
 const MY_EVENTS_URL = 'http://localhost:8000/api/my-appointments/';
@@ -59,7 +58,6 @@ const UPDATE_AVAILABILITY_URL = 'http://localhost:8000/api/update-availability/'
 export class AppointmentService {
   myInvitations: EventsAPI;
   // Accessing appointments happens from here.
-  searching = false;
   searchResults: SearchAPI = null;
   myAppointments: EventsAPI;
   everyoneAppointments: EventsAPI;
@@ -112,7 +110,6 @@ export class AppointmentService {
       (res: SearchAPI) => {
       console.log('Search results');
       console.log(res);
-      this.searching = true;
 
       if (!res.success) {
         return reject(res.message);

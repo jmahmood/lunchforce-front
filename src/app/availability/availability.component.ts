@@ -69,7 +69,7 @@ export class AvailabilityComponent implements OnInit {
   }
 
   // Get all days for this month; includes days to round out the week, and removes any old days before the start of the current week,
-  // since tehre is no point (yet) in showing htem.
+  // since there is no point (yet) in showing them.
 
   getDaysInMonth(month: number, year: number): Date[] {
      const lastweek = new Date(year, month, 1);
@@ -138,8 +138,15 @@ export class AvailabilityComponent implements OnInit {
 
   set_selected_dates(): void {
     const ret = Object.keys(this.selected_dates);
-    ret.sort();
-    this.selected_dates_array = ret.slice(0, 5);
+    const to_sort = [];
+    for (const b of ret) {
+      const c = new Date(b);
+      to_sort.push(c);
+    }
+    to_sort.sort((a, b) => {
+      return a - b;
+    });
+    this.selected_dates_array = to_sort.slice(0, 5);
   }
 
   next_month() {

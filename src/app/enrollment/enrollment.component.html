@@ -15,7 +15,7 @@
              ngModel required #enrollmentEmail="ngModel" email="true" appSalesforceOnly>
       <div [hidden]="enrollmentEmail.valid || enrollmentEmail.pristine && !authService.enrollment.submitted"
            class="alert alert-danger">
-        You must enter a valid email.
+        You must enter a valid email.  You can only register with a salesforce.com email.
       </div>
     </div>
 

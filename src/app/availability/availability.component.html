@@ -49,7 +49,7 @@
     Your next 5 days are:
     <ul>
       <li class="list-group-item" *ngFor="let d of selected_dates_array">
-        {{ d }}
+        {{ d | date: 'yyyy-MM-dd'}}
       </li>
     </ul>
   </div>

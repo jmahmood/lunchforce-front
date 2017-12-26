@@ -14,6 +14,9 @@ import { InvitationSuccessComponent } from './invitation-success/invitation-succ
 import { EnrollmentComponent } from './enrollment/enrollment.component';
 import { MyEventsComponent } from './my-events/my-events.component';
 import { SearchComponent } from './search/search.component';
+import { NavComponent } from './nav/nav.component';
+import { LoginComponent } from './login/login.component';
+import {CookieService} from "ngx-cookie-service";
 
 @NgModule({
   declarations: [
@@ -27,6 +30,8 @@ import { SearchComponent } from './search/search.component';
     EnrollmentComponent,
     MyEventsComponent,
     SearchComponent,
+    NavComponent,
+    LoginComponent,
   ],
   imports: [
     BrowserModule,
@@ -34,7 +39,7 @@ import { SearchComponent } from './search/search.component';
     HttpClientModule,
     ModalModule.forRoot(),
   ],
-  providers: [],
+  providers: [CookieService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

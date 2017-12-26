@@ -6,6 +6,7 @@ import {AppointmentService} from './appointment.service';
 import {AuthService} from './auth.service';
 import {FoodOptions, InitService, LocationOptions} from './init.service';
 import {NavService} from './nav.service';
+import {CookieService} from "ngx-cookie-service";
 
 
 @Component({
@@ -24,7 +25,6 @@ export class AppComponent implements OnInit {
 
 
   @ViewChild('errorModal') private errorModal: TemplateRef<any>;
-  @ViewChild('loginForm') loginForm: NgForm;
 
   modalRef: BsModalRef; // To trigger bootstrap modals.
 
@@ -45,30 +45,6 @@ export class AppComponent implements OnInit {
     });
   }
 
-  goSearch() {
-    this.navService.search();
-  }
-
-
-  goInvitedToEvents() {
-    this.navService.invitedto();
-  }
-
-  goMyEvents() {
-    this.navService.myevents();
-  }
-
-  goLogin() {
-    this.navService.login();
-  }
-
-  goProfile() {
-    this.navService.profile();
-  }
-
-  goEnrollment() {
-    this.navService.enrollment();
-  }
 
   appointments(): LunchAppointment[] {
     if (this.navService.is('myevents')) {
@@ -90,21 +66,21 @@ export class AppComponent implements OnInit {
     setTimeout(() => { this.joinedAppointment = false; }, 1000);
   }
 
-  onSubmitLogin(): void {
-    // We need to load our own events, and the public / 'Everyone' appointments
+  onLogin(data): void {
+    console.log(data);
+    this.authService.send_login(data).then(() => {
+      console.log('Emitting event');
+      this.onLoginTokenSet();
+    });
+  };
 
-    this.navService.waiting();
-    this.authService.send_login(this.loginForm.value).then(() => {
-      this.navService.loadmyevents();
-      const p1 = this.appointmentService.my(this.authService.token);
-      const p2 = this.appointmentService.everyone(this.authService.token);
-      const p3 = this.appointmentService.available(this.authService.token);
-      const p4 = this.authService.my_profile();
-      const p5 = this.appointmentService.invitations(this.authService.token);
-      return Promise.all([p1, p2, p3, p4, p5]);
-    }).then(() => {
+
+  onLoginTokenSet(): void {
+    console.log('Event caught.');
+    this.postLoginSetup().then( () => {
       this.navService.myevents();
-    }).catch((err) => {
+      this.cookieService.set('login_token', this.authService.token);
+    }).catch( (err) => {
       this.navService.login();
       if (err.status === 0) {
         this.authService.login.error_messages = ['Could not connect to server'];
@@ -113,14 +89,26 @@ export class AppComponent implements OnInit {
     });
   }
 
+  postLoginSetup(): Promise<any> {
+      this.navService.loadmyevents();
+      const p1 = this.appointmentService.my(this.authService.token);
+      const p2 = this.appointmentService.everyone(this.authService.token);
+      const p3 = this.appointmentService.available(this.authService.token);
+      const p4 = this.authService.my_profile();
+      const p5 = this.appointmentService.invitations(this.authService.token);
+      return Promise.all([p1, p2, p3, p4, p5]);
+  }
+
   constructor(private modalService: BsModalService,
               public authService: AuthService,
               public appointmentService: AppointmentService,
               public initService: InitService,
-              public navService: NavService
+              public navService: NavService,
+              public cookieService: CookieService
               ) {
 
   }
+
   ngOnInit() {
     this.authService.clear();
     this.navService.login();
@@ -144,5 +132,11 @@ export class AppComponent implements OnInit {
       console.log('could not load food options');
       console.log(err);
     });
+
+    if (this.authService.check_cookies(this.cookieService)){
+      console.log('We have a cookie set with the token information.');
+      this.onLoginTokenSet();
+    }
+
   }
 }
