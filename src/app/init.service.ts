@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {reject} from 'q';
 
-const FOODOPTIONS_URL = 'http://localhost:8000/api/food-options/';
-const LOCATIONS_URL = 'http://localhost:8000/api/locations/';
+const FOODOPTIONS_URL = 'https://jbm-lunchforce-staging.herokuapp.com/api/food-options/';
+const LOCATIONS_URL = 'https://jbm-lunchforce-staging.herokuapp.com/api/locations/';
 
 
 export interface FoodOptionsAPI {

@@ -16,7 +16,7 @@ export class InvitationSuccessComponent implements OnInit {
   }
 
   goInvitation() {
-    this.authService.blank_invitation();
+    this.authService.blank_introduction();
     this.navService.introduction();
   }
 

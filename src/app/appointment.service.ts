@@ -44,14 +44,14 @@ export interface SetAvailablilityAPI {
 }
 
 
-// http://localhost:8000/api/my-appointments/
-const SEARCH_URL = 'http://localhost:8000/api/search/';
-const ATTEND_EVENT_URL = 'http://localhost:8000/api/attend/';
-const MY_EVENTS_URL = 'http://localhost:8000/api/my-appointments/';
-const PUBLIC_EVENTS_URL = 'http://localhost:8000/api/public-appointments/';
-const INVITATEDTO_URL = 'http://localhost:8000/api/invitedto-appointments/';
-const MY_AVAILABILITY_URL = 'http://localhost:8000/api/my-availability/';
-const UPDATE_AVAILABILITY_URL = 'http://localhost:8000/api/update-availability/';
+// https://jbm-lunchforce-staging.herokuapp.com/api/my-appointments/
+const SEARCH_URL = 'https://jbm-lunchforce-staging.herokuapp.com/api/search/';
+const ATTEND_EVENT_URL = 'https://jbm-lunchforce-staging.herokuapp.com/api/attend/';
+const MY_EVENTS_URL = 'https://jbm-lunchforce-staging.herokuapp.com/api/my-appointments/';
+const PUBLIC_EVENTS_URL = 'https://jbm-lunchforce-staging.herokuapp.com/api/public-appointments/';
+const INVITATEDTO_URL = 'https://jbm-lunchforce-staging.herokuapp.com/api/invitedto-appointments/';
+const MY_AVAILABILITY_URL = 'https://jbm-lunchforce-staging.herokuapp.com/api/my-availability/';
+const UPDATE_AVAILABILITY_URL = 'https://jbm-lunchforce-staging.herokuapp.com/api/update-availability/';
 
 
 @Injectable()

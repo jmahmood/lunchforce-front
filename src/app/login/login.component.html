@@ -1,0 +1,65 @@
+
+<div class="container">
+  <div class="row">
+
+    <div class="col-sm-7 hidden-xs">
+      <div class="jumbotron">
+        <h2 i18n="login tagline">Pop your filter bubble over lunch!</h2>
+        <p i18n="login short description">(AKA: Meet your coworkers)</p>
+        <ol>
+          <li i18n="login get invitation">Get an <a href="#">invitation to <strong>Rocklunch</strong></a></li>
+          <li i18n="login set availability">Set your lunch <a href="#">availability</a></li>
+          <li i18n="login great algo">Our unique <a href="#">algorithm</a> matches you to fresh people</li>
+        </ol>
+
+        <a class="btn btn-primary" href="#" role="button" i18n="login learn more">Learn more</a>
+      </div>
+    </div>
+    <div class="login-container col-sm-5" id="formContainer">
+        <form id="login" class="form-signin" role="form" (submit)="onSubmitLogin()" #loginForm="ngForm">
+          <h3 class="form-signin-heading">Please sign in</h3>
+          <a href="#" id="flipToRecover" class="flipLink" (click)="fliplink($event)">
+            <div id="triangle-topright"></div>
+          </a>
+          <input type="email" class="form-control" id="loginFormEmail" name="loginFormEmail"
+                 placeholder="Email" ngModel #loginFormEmail="ngModel" email="true" required appSalesforceOnly autofocus>
+
+          <input type="password" class="form-control" id="loginFormPassword" name="loginFormPassword"
+                   placeholder="Password" ngModel minlength="8" #loginFormPassword="ngModel"
+                   required>
+
+          <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+
+          <div class="alert alert-danger" role="alert" [hidden]="authService.login.error_messages.length == 0">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span>
+            <span *ngFor="let err_msg of authService.login.error_messages">
+                {{err_msg}}<br>
+            </span>
+          </div>
+          <div class="alert alert-success" role="alert" [hidden]="!authService.enrollment.submitted || !authService.enrollment.success">
+            <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
+            Your Enrollment was successful.  Please log in using the same email and password.
+          </div>
+
+        </form>
+
+        <form class="form-signin" id="recover" role="form">
+          <h3 class="form-signin-heading">Enter email address</h3>
+          <a href="#" id="flipToLogin" class="flipLink" (click)="fliplink($event)">
+            <div id="triangle-topleft"></div>
+          </a>
+          <input type="email" class="form-control" name="loginEmail2" id="loginEmail2" placeholder="Email address" required autofocus>
+          <button class="btn btn-lg btn-primary btn-block" type="submit">Recover password</button>
+        </form>
+      </div> <!-- login form -->
+  </div>
+  <h3>Frequently Asked Questions</h3>
+  <p>
+    <a class="btn btn-primary" href="#" role="button">Who are you?</a>
+    <a class="btn btn-primary" href="#" role="button">Why do this?</a>
+    <a class="btn btn-primary" href="#" role="button">How does this work?</a>
+    <a class="btn btn-primary" href="#" role="button">Can I have an invitation?</a>
+    <a class="btn btn-primary" href="#" role="button">How can I contact you?</a>
+  </p>
+</div>

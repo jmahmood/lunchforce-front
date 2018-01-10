@@ -1,27 +1,28 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {reject} from 'q';
-import {CookieService} from "ngx-cookie-service";
+import {CookieService} from 'ngx-cookie-service';
 
-const SERVER_URL = 'http://localhost:8001/';
-const ENROLLMENT_URL = SERVER_URL + 'Enrollment/Success/';
-// const LOGIN_URL = SERVER_URL + 'Login/Success/';
-const LOGIN_URL = 'http://localhost:8000/api-token-auth/';
-const GET_PROFILE_URL = 'http://localhost:8000/api/my-profile/';
-// const LOGIN_URL = SERVER_URL + 'Login/Failure/';
-const INVITATION_URL = SERVER_URL + 'InvitationCode/Create/Success/';
-const PROFILE_UPDATE_URL = 'http://localhost:8000/api/update-profile/';
-const LOGOUT_URL = SERVER_URL + 'Logout/Success/';
+// TODO
+const INTRODUCTION_URL = 'https://jbm-lunchforce-staging.herokuapp.com/api/introduce/';
+const ENROLLMENT_URL = 'https://jbm-lunchforce-staging.herokuapp.com/api/enroll/';
+
+//  Done
+const LOGIN_URL = 'https://jbm-lunchforce-staging.herokuapp.com/api-token-auth/';
+const LOGOUT_URL = 'https://jbm-lunchforce-staging.herokuapp.com/logout/';
+const GET_PROFILE_URL = 'https://jbm-lunchforce-staging.herokuapp.com/api/my-profile/';
+const PROFILE_UPDATE_URL = 'https://jbm-lunchforce-staging.herokuapp.com/api/update-profile/';
 
 export interface LogoutAPI {
   success: boolean;
   error_messages: string[];
 }
 
-export interface InvitationAPI {
-  invitation_code: string;
+export interface IntroductionAPI {
+  introduction_code: string;
+  email: string;
   success: boolean;
-  error_message: string;
+  message: string;
 }
 
 export interface ProfileAPI {
@@ -31,14 +32,14 @@ export interface ProfileAPI {
 
 export interface EnrollmentPostAPI {
   enrollmentEmail: string;
-  enrollmentInvitationCode: string;
+  enrollmentIntroductionCode: string;
   enrollmentPassword: string;
   selectLocation: string;
   selectWhitelist: string;
 }
 
-export interface InvitationPostAPI {
-  invitationEmail: string;
+export interface IntroductionPostAPI {
+  introductionEmail: string;
 }
 
 export interface LoginPostAPI {
@@ -49,14 +50,13 @@ export interface LoginPostAPI {
 export interface EnrollmentAPI {
   success: boolean;
   message: string;
-  error_fields: string[];
 }
 
-export interface Invitation {
+export interface Introduction {
   email: string;
-  invitation_code: string;
+  introduction_code: string;
   submitted: boolean;
-  error_messages: string[];
+  message: string;
 }
 
 export interface ProfileDetails {
@@ -92,7 +92,7 @@ export interface Enrollment {
 @Injectable()
 export class AuthService {
   enrollment: Enrollment;
-  invitation: Invitation;
+  introduction: Introduction;
   profile: ProfileDetails;
   login: Login;
   token: string;
@@ -108,12 +108,12 @@ export class AuthService {
       };
   }
 
-  blank_invitation(): void {
-    this.invitation = {
+  blank_introduction(): void {
+    this.introduction = {
         'email': '',
-        'invitation_code': '',
+        'introduction_code': '',
         'submitted': false,
-        'error_messages': []
+        'message': ''
       };
   }
 
@@ -127,7 +127,7 @@ export class AuthService {
 
   clear(): void {
       this.blank_login();
-      this.blank_invitation();
+      this.blank_introduction();
       this.blank_enrollment();
   }
 
@@ -142,27 +142,29 @@ export class AuthService {
     return false;
   }
 
-  send_introduction(invitation_post_data: InvitationPostAPI): Promise<any> {
+  send_introduction(introduction_post_data: IntroductionPostAPI): Promise<any> {
     // Ensure logged in.
     // Add API to backend
     // Ensure this is checked when someone enrolls.
     // Only Salesforce.com emails are acceptable
-    console.log(invitation_post_data);
-    this.invitation.submitted = true;
+    const token_header = new HttpHeaders().set('Authorization', 'Token ' + this.token);
+    this.introduction.submitted = true;
     this.login.submitted = true;
-    this.invitation.email = invitation_post_data.invitationEmail;
-    return this.http.post(INVITATION_URL, invitation_post_data).toPromise().then((res: InvitationAPI) => {
+    this.introduction.email = introduction_post_data.introductionEmail;
+    return this.http.post(INTRODUCTION_URL, introduction_post_data, {'headers': token_header}).toPromise().then((res: IntroductionAPI) => {
       if (!res.success) {
-        this.invitation.error_messages = [res.error_message];
-        return reject(res.error_message);
+        this.introduction.message = res.message;
+        return reject(res.message);
       }
-      this.invitation.invitation_code = res.invitation_code;
-      this.invitation.error_messages = [];
+      this.introduction.introduction_code = res.introduction_code;
+      this.introduction.email = res.email;
+      this.introduction.message = '';
     });
   }
 
   // Moving to using Login API etc
   send_enrollment(enrollment_post_data: EnrollmentPostAPI): Promise<any> {
+    // Anyone can enroll, given that they have a valid api code.
     this.enrollment.submitted = true;
     return this.http.post(ENROLLMENT_URL, enrollment_post_data).toPromise().then((res: EnrollmentAPI) => {
       console.log(res);
@@ -229,11 +231,14 @@ export class AuthService {
    return false;
  }
 
-  logout(): Promise<any> {
-    return this.http.post(LOGOUT_URL, {}).toPromise().then( (res: LogoutAPI) => {
+  logout(cookieService: CookieService): Promise<any> {
+    const token_header = new HttpHeaders().set('Authorization', 'Token ' + this.token);
+
+    return this.http.get(LOGOUT_URL, {'headers': token_header}).toPromise().then( (res: LogoutAPI) => {
       if (!res.success) {
         return reject('Failure while logging out.');
       }
+      cookieService.deleteAll();
       this.clear();
       return res;
     });

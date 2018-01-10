@@ -1,12 +1,11 @@
 import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {LunchAppointment} from './app.model';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
-import {NgForm} from '@angular/forms';
 import {AppointmentService} from './appointment.service';
 import {AuthService} from './auth.service';
 import {FoodOptions, InitService, LocationOptions} from './init.service';
 import {NavService} from './nav.service';
-import {CookieService} from "ngx-cookie-service";
+import {CookieService} from 'ngx-cookie-service';
 
 
 @Component({
@@ -32,19 +31,6 @@ export class AppComponent implements OnInit {
     this.modalRef = this.modalService.show(template);
   }
 
-  goLogout() {
-    this.authService.logout().then( () => {
-      console.log('Logout Successful.');
-      this.authService.clear();
-      this.appointmentService.clear();
-      this.navService.login();
-    }).catch(() => {
-      console.log('failure while logging out; are you still connected to the internet?  Check our uptime at ()');
-      this.errormodal_message = 'failure while logging out; are you still connected to the internet?  Check our uptime at';
-      this.openModal(this.errorModal);
-    });
-  }
-
 
   appointments(): LunchAppointment[] {
     if (this.navService.is('myevents')) {
@@ -66,13 +52,28 @@ export class AppComponent implements OnInit {
     setTimeout(() => { this.joinedAppointment = false; }, 1000);
   }
 
+  loginError() {
+    const navService = this.navService;
+    const authService = this.authService;
+    return (err) => {
+      navService.login();
+      if (err.status === 400) {
+        authService.login.error_messages = ['Invalid username or password'];
+      }
+      if (err.status === 0) {
+        authService.login.error_messages = ['Could not connect to server'];
+      }
+      console.log(err);
+    };
+  }
+
   onLogin(data): void {
     console.log(data);
     this.authService.send_login(data).then(() => {
       console.log('Emitting event');
       this.onLoginTokenSet();
-    });
-  };
+    }).catch(this.loginError());
+  }
 
 
   onLoginTokenSet(): void {
@@ -80,13 +81,7 @@ export class AppComponent implements OnInit {
     this.postLoginSetup().then( () => {
       this.navService.myevents();
       this.cookieService.set('login_token', this.authService.token);
-    }).catch( (err) => {
-      this.navService.login();
-      if (err.status === 0) {
-        this.authService.login.error_messages = ['Could not connect to server'];
-      }
-      console.log(err);
-    });
+    }).catch(this.loginError());
   }
 
   postLoginSetup(): Promise<any> {
@@ -133,7 +128,7 @@ export class AppComponent implements OnInit {
       console.log(err);
     });
 
-    if (this.authService.check_cookies(this.cookieService)){
+    if (this.authService.check_cookies(this.cookieService)) {
       console.log('We have a cookie set with the token information.');
       this.onLoginTokenSet();
     }

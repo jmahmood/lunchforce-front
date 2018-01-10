@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="bde68c2c0a923fbb85dd838ad338b6fb399458a9" datatype="html">
+        <source>Pop your filter bubble over lunch!</source>
+        <target>日本語版Pop your filter bubble over lunch!</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/login/login.component.ts</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <note priority="1" from="description">login tagline</note>
+      </trans-unit>
+      <trans-unit id="4606af86c2fdaf33d7057f0740e4bf06122cae79" datatype="html">
+        <source>(AKA: Meet your coworkers)</source>
+        <target>(AKA: 同僚と仲良くしましょう)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/login/login.component.ts</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <note priority="1" from="description">login short description</note>
+      </trans-unit>
+      <trans-unit id="26bf2d98d4daedcb36f8fae8ab984100311d3d54" datatype="html">
+        <source>Get an <x id="START_LINK" ctype="x-a" equiv-text="&lt;a&gt;"/>invitation to <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Rocklunch<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/><x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></source>
+        <target>ロックランチの招待もらいましょう</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/login/login.component.ts</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <note priority="1" from="description">login get invitation</note>
+      </trans-unit>
+      <trans-unit id="a1ee849af522c90d8edbb32a1ba406dc18378bd7" datatype="html">
+        <source>Set your lunch <x id="START_LINK" ctype="x-a" equiv-text="&lt;a&gt;"/>availability<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></source>
+        <target>予定日を設定しましょう</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/login/login.component.ts</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <note priority="1" from="description">login set availability</note>
+      </trans-unit>
+      <trans-unit id="aed724e444d7d605072d90a24bea05691c72883a" datatype="html">
+        <source>Our unique <x id="START_LINK" ctype="x-a" equiv-text="&lt;a&gt;"/>algorithm<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> matches you to fresh people</source>
+        <target>アルゴリズムが最高ランチ相棒を探してくれる</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/login/login.component.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <note priority="1" from="description">login great algo</note>
+      </trans-unit>
+      <trans-unit id="e2dcf27db9c6a5e249960c576014aa40b3883360" datatype="html">
+        <source>Learn more</source>
+        <target>嘘でしょうー</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/login/login.component.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <note priority="1" from="description">login learn more</note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

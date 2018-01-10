@@ -2,6 +2,8 @@
 
 # compiled output
 /dist
+/dist-ja
+/dist-en
 /tmp
 /out-tsc
 

@@ -1,9 +1,7 @@
-<div class="alert alert-danger" role="alert" [hidden]="authService.invitation.error_messages.length == 0">
+<div class="alert alert-danger" role="alert" [hidden]="!authService.introduction.message">
   <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
   <span class="sr-only">Error:</span>
-  <span *ngFor="let err_msg of authService.invitation.error_messages">
-      {{err_msg}}<br>
-  </span>
+  {{authService.introduction.message}}
 </div>
 
 <form id="introductionForm" (ngSubmit)="onSubmitIntroduction()" #introductionForm="ngForm">

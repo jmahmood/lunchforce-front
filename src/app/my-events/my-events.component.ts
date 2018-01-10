@@ -9,6 +9,7 @@ import {NavService} from '../nav.service';
   styleUrls: ['./my-events.component.css']
 })
 export class MyEventsComponent implements OnInit {
+  joinedAppointment = false;
 
   goAvailability() {
     this.navService.availability();

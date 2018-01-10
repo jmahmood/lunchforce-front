@@ -16,7 +16,10 @@ import { MyEventsComponent } from './my-events/my-events.component';
 import { SearchComponent } from './search/search.component';
 import { NavComponent } from './nav/nav.component';
 import { LoginComponent } from './login/login.component';
-import {CookieService} from "ngx-cookie-service";
+import {CookieService} from 'ngx-cookie-service';
+import { registerLocaleData } from '@angular/common';
+import localeJa from '@angular/common/locales/ja';
+
 
 @NgModule({
   declarations: [

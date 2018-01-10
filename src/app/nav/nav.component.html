@@ -1,0 +1,34 @@
+<div class="container-fluid" *ngIf="authService.login.success">
+  <!-- Brand and toggle get grouped for better mobile display -->
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" aria-expanded="false">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="#">
+      <img alt="LunchForce" src="assets/sandwich-311262_640.png">
+    </a>
+  </div>
+
+  <!-- Collect the nav links, forms, and other content for toggling -->
+    <ul class="nav navbar-nav" *ngIf="!authService.login.success; else WelcomeNav">
+      <li (click)="navService.login()" [ngClass]="{'active': state == 'login'}"><a href="#">Login <span class="sr-only">(current)</span></a></li>
+      <li (click)="navService.enrollment()" [ngClass]="{'active': state == 'enrollment'}"><a href="#">Enrollment</a></li>
+    </ul>
+    <ng-template #WelcomeNav>
+      <ul class="nav navbar-nav"><li class="navbar-text" >Welcome back {{ authService.profile.profile.name }}</li></ul>
+    </ng-template>
+
+    <ul class="nav navbar-nav navbar-right" *ngIf="authService.login.success">
+      <li [ngClass]="{'active': navService.state == 'myevents'}" (click)="navService.myevents()"><a href="#"><span class="glyphicon glyphicon-th-list"></span> My Events</a></li>
+      <li [ngClass]="{'active': navService.state == 'publicevents'}" (click)="navService.publicevents()"><a href="#"><span class="glyphicon glyphicon-calendar"></span> Public <span class="badge">{{appointmentService.everyoneAppointments.appointments.length}}</span></a></li>
+      <li [ngClass]="{'active': navService.state == 'invitedto'}" (click)="navService.invitedto()"><a href="#"><span class="glyphicon glyphicon-calendar"></span> Invitations <span class="badge">{{appointmentService.myInvitations.appointments.length}}</span></a></li>
+      <li [ngClass]="{'active': navService.state == 'availability'}" (click)="navService.availability()"><a href="#"><span class="glyphicon glyphicon-time"></span> Availability</a></li>
+      <li [ngClass]="{'active': navService.state == 'profile'}" (click)="navService.profile()"><a href="#"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
+      <li [ngClass]="{'active': navService.state == 'search'}" (click)="navService.search()"><a href="#"><span class="glyphicon glyphicon-search"></span> Search</a></li>
+      <li [ngClass]="{'active': navService.state == 'introductionsuccess' || navService.state == 'introduction'}" (click)="navService.introduction()"><a href="#"><span class="glyphicon glyphicon-share"></span> Introduce</a></li>
+      <li [ngClass]="{'active': navService.state == 'logout'}" (click)="goLogout()"><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+    </ul>
+</div><!-- /.container-fluid -->

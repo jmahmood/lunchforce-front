@@ -1,4 +1,4 @@
-import {AfterContentChecked, Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {FoodOptions, LocationOptions} from '../init.service';
 import {AuthService} from '../auth.service';
 import {AppointmentService} from '../appointment.service';
@@ -19,7 +19,7 @@ export class SearchComponent implements OnInit {
 
   appointments() {
     // Returns a list of all possible appointments for search conditions provided.
-    if (!this.appointmentService.searchResults){
+    if (!this.appointmentService.searchResults) {
       return [];
     }
     return this.appointmentService.searchResults.youonly.concat(this.appointmentService.searchResults.everyone);
